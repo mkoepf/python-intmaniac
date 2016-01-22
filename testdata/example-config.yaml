@@ -1,0 +1,36 @@
+---
+version: 1.0
+output_format: teamcity
+# everything in the global key will be merged into every test, with the test data
+# getting preference.
+global:
+  config:
+    test_container: hub.cognotekt.int:5000/production/testsuite:latest
+    docker_compose_template: docker-compose.yml.tmpl
+    docker_compose_params: # [ ... ]
+    test_service: # if test_script is given, this is the service which is
+                  # used for docker-compose run commands
+    test_shell:   # /bin/bash by default
+    test_script:  # will be passed to '$test_shell -c "HERE"'
+    run_timeout: 60
+# either dict or array allowed.
+# internally, a dict is wrapped into an array (one more layer).
+# all tests sets in a dict are executed in parallel,
+# the outer array in serial
+testsets:
+  - default:
+      latest:
+        # available as TEST_COMPANION_x in the environment of the
+        # docker-compose run, AND the following strings will be replaced
+        # in the docker-compose template: %%COMPANION_x%%
+        environment:
+          companion0: hub.cognotekt.int:5000/production/rsas:latest
+        # overwrite global config settings if needed. if not, global
+        # settings are used.
+        meta:
+          docker_compose_template: /some/other/template.yaml
+          allow_failure: true
+  - default:
+      demo:
+        environment:
+          companion0: hub.cognotekt.int:5000/production/rsas:demo
