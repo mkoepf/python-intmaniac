@@ -8,10 +8,7 @@ import sys
 from argparse import ArgumentParser
 import tools
 
-test_config_stub = {'config': {}, 'meta': {}, 'environment': {}}
-full_config_stub = {'global': test_config_stub, 'testsets': {}}
 config = None
-testconfig = None
 
 
 def fail(errormessage):
@@ -19,12 +16,20 @@ def fail(errormessage):
     sys.exit(-10)
 
 
+def get_test_config_stub():
+    return {'config': {}, 'meta': {}, 'environment': {}}
+
+
+def get_full_config_stub():
+    return {'global': get_test_config_stub(), 'testsets': {}}
+
+
 def get_test_set_groups():
 
     def get_setupdata():
         try:
             return \
-                {**full_config_stub,
+                {**get_full_config_stub(),
                  **yaml.safe_load(open(config.config_file, "r"))}
         except FileNotFoundError:
             fail("Could not find configuration file: %s" % config.config_file)
@@ -63,7 +68,7 @@ def get_test_set_groups():
                     else tsname
                 tsglobal = tools.deep_merge(
                     global_config,
-                    tests.pop("_global", test_config_stub))
+                    tests.pop("_global", get_test_config_stub()))
                 ts = Testset(name=tsname, global_config=tsglobal)
                 tsgroup_list.append(ts)
                 for test_name, test_config in tests.items():
