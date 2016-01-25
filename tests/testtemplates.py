@@ -4,7 +4,7 @@ import unittest
 from testrunner import prepare_environment, get_test_set_groups
 
 
-class TestEmptyTemplate(unittest.TestCase):
+class TestTemplateEmpty(unittest.TestCase):
 
     def setUp(self):
         prepare_environment("-c ../testdata/testconfig_empty.yaml".split())
@@ -17,7 +17,7 @@ class TestEmptyTemplate(unittest.TestCase):
         self.assertEqual(0, len(tsgs[0]))
 
 
-class TestArrayTripleTest(unittest.TestCase):
+class TestTemplateArrayTriple(unittest.TestCase):
 
     def setUp(self):
         prepare_environment("-c ../testdata/testconfig_array_triple.yaml".split())
