@@ -5,6 +5,7 @@ from tools import deep_merge
 import os.path
 import threading
 from re import sub as resub
+import shutil
 
 
 default_config = {
@@ -54,6 +55,7 @@ class Testrun(threading.Thread):
         return self.__str__()
 
     def init_environment(self):
+        shutil.rmtree(self.test_dir, ignore_errors=True)
         os.mkdir(self.test_dir)
         os.chdir(self.test_dir)
         # TODO - catch & error handling if template cannot be found.
