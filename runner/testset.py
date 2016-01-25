@@ -37,7 +37,7 @@ class Testset(Thread):
             else:
                 self.failed_tests.append(test)
                 self.success = False
-        return self.succeeded
+        return self.success
 
 
 
