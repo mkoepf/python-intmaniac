@@ -7,6 +7,8 @@ from runner.testset import Testset
 import sys
 from argparse import ArgumentParser
 import tools
+from output import init_output
+import os
 
 config = None
 
@@ -21,10 +23,42 @@ def get_test_config_stub():
 
 
 def get_full_config_stub():
-    return {'global': get_test_config_stub(), 'testsets': {}}
+    return {'global': get_test_config_stub(), 'testsets': {}, 'output_format': 'text'}
 
 
-def get_test_set_groups():
+def get_test_set_groups(setupdata):
+    """Always returns a list of list of Testsets
+        :param setupdata the full yaml setup data
+    """
+    test_set_groups = setupdata['testsets']
+    global_config = setupdata['global']
+    step = 0
+    rv = []
+    # if it's not a list, just wrap it into one.
+    if type(test_set_groups) == dict:
+        test_set_groups = [test_set_groups]
+    for tsgroup in test_set_groups:
+        tsgroup_list = []
+        rv.append(tsgroup_list)
+        # this must be dict now
+        for tsname in sorted(tsgroup.keys()):
+            # makes for predictable order for testing ...
+            tests = tsgroup[tsname]
+            tsname = "%02d-%s" % (step, tsname) \
+                if len(test_set_groups) > 1 \
+                else tsname
+            tsglobal = tools.deep_merge(
+                global_config,
+                tests.pop("_global", get_test_config_stub()))
+            ts = Testset(name=tsname, global_config=tsglobal)
+            tsgroup_list.append(ts)
+            for test_name, test_config in tests.items():
+                ts.add_from_config(test_name, test_config)
+        step += 1
+    return rv
+
+
+def get_and_init_configuration():
 
     def get_setupdata():
         try:
@@ -45,41 +79,10 @@ def get_test_set_groups():
                     fail("Invalid environment setting: %s" % tmp)
         return global_config
 
-    def get_test_sets_inner(setupdata):
-        """Always returns a list of list of Testsets
-            :param setupdata the full yaml setup data
-        """
-        test_set_groups = setupdata['testsets']
-        global_config = setupdata['global']
-        step = 0
-        rv = []
-        # if it's not a list, just wrap it into one.
-        if type(test_set_groups) == dict:
-            test_set_groups = [test_set_groups]
-        for tsgroup in test_set_groups:
-            tsgroup_list = []
-            rv.append(tsgroup_list)
-            # this must be dict now
-            for tsname in sorted(tsgroup.keys()):
-                # makes for predictable order for testing ...
-                tests = tsgroup[tsname]
-                tsname = "%02d-%s" % (step, tsname) \
-                    if len(test_set_groups) > 1 \
-                    else tsname
-                tsglobal = tools.deep_merge(
-                    global_config,
-                    tests.pop("_global", get_test_config_stub()))
-                ts = Testset(name=tsname, global_config=tsglobal)
-                tsgroup_list.append(ts)
-                for test_name, test_config in tests.items():
-                    ts.add_from_config(test_name, test_config)
-            step += 1
-        return rv
-
     setupdata = get_setupdata()
     prepare_global_config(setupdata)
-    tmp = get_test_sets_inner(setupdata)
-    return tmp
+    init_output(setupdata['output_format'])
+    return setupdata
 
 
 def run_test_set_groups(tsgs):
@@ -107,6 +110,7 @@ def prepare_environment(arguments):
 
 if __name__ == "__main__":
     prepare_environment(sys.argv)
-    result = run_test_set_groups(get_test_set_groups())
+    configuration = get_and_init_configuration()
+    result = run_test_set_groups(get_test_set_groups(configuration))
     if not result:
         sys.exit(1)

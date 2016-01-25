@@ -2,15 +2,18 @@
 
 import unittest
 from testrunner import prepare_environment, get_test_set_groups
+from testrunner import get_and_init_configuration
 
 
 class TestTemplateEmpty(unittest.TestCase):
 
     def setUp(self):
         prepare_environment("-c ../testdata/testconfig_empty.yaml".split())
+        config = get_and_init_configuration()
+        self.tsgs = get_test_set_groups(config)
 
     def testNumberOfTestsetsCreated(self):
-        tsgs = get_test_set_groups()
+        tsgs = self.tsgs
         self.assertIsInstance(tsgs, list)
         self.assertEqual(len(tsgs), 1)
         self.assertIsInstance(tsgs[0], list)
@@ -21,7 +24,8 @@ class TestTemplateArrayTriple(unittest.TestCase):
 
     def setUp(self):
         prepare_environment("-c ../testdata/testconfig_array_triple.yaml".split())
-        self.tsgs = get_test_set_groups()
+        config = get_and_init_configuration()
+        self.tsgs = get_test_set_groups(config)
 
     def test_created_testset_groups(self):
         tsgs = self.tsgs
@@ -59,7 +63,8 @@ class TestTemplateKeysTriple(unittest.TestCase):
 
     def setUp(self):
         prepare_environment("-c ../testdata/testconfig_keys_triple.yaml".split())
-        self.tsgs = get_test_set_groups()
+        config = get_and_init_configuration()
+        self.tsgs = get_test_set_groups(config)
 
     def test_created_testset_groups(self):
         tsgs = self.tsgs
