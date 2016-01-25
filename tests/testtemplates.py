@@ -23,7 +23,7 @@ class TestTemplateArrayTriple(unittest.TestCase):
         prepare_environment("-c ../testdata/testconfig_array_triple.yaml".split())
         self.tsgs = get_test_set_groups()
 
-    def test_number_of_tests_created(self):
+    def test_created_testset_groups(self):
         tsgs = self.tsgs
         self.assertIsInstance(tsgs, list)
         self.assertEqual(len(tsgs), 2)
@@ -53,6 +53,40 @@ class TestTemplateArrayTriple(unittest.TestCase):
                     tcount += 1
                 tscount += 1
             tlcount += 1
+
+
+class TestTemplateKeysTriple(unittest.TestCase):
+
+    def setUp(self):
+        prepare_environment("-c ../testdata/testconfig_keys_triple.yaml".split())
+        self.tsgs = get_test_set_groups()
+
+    def test_created_testset_groups(self):
+        tsgs = self.tsgs
+        self.assertIsInstance(tsgs, list)
+        self.assertEqual(len(tsgs), 1)
+        self.assertIsInstance(tsgs[0], list)
+        self.assertEqual(3, len(tsgs[0]))
+
+    def test_given_names(self):
+        tsgs = self.tsgs
+        self.assertEqual(tsgs[0][0].name, "ts1")
+        self.assertEqual(tsgs[0][1].name, "ts2")
+        self.assertEqual(tsgs[0][2].name, "ts3")
+
+    def test_environment_setting_and_propagation(self):
+        tscount = 1
+        tcount = 1
+        tsgs = self.tsgs
+        for tlist in tsgs:
+            for tset in tlist:
+                tests = sorted(tset.tests, key=lambda x: x.name)
+                for test in tests:
+                    tname = "ts%d-test%d" % (tscount, tcount)
+                    self.assertEqual(tname, test.name)
+                    self.assertEqual(test.test_env[str(tcount)], str(tcount))
+                    tcount += 1
+                tscount += 1
 
 
 if __name__ == "__main__":
