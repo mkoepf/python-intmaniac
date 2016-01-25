@@ -98,8 +98,7 @@ class Testrun(threading.Thread):
             stdout=sp.PIPE, stderr=sp.STDOUT,
             universal_newlines=True,
         ))
-        tmp = self.results[-1]
-        tmp = tmp
+        return self.results[-1]
 
     def run(self):
         try:
