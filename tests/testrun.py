@@ -25,11 +25,19 @@ configs = [
         ),
         'kwargs': {"name": "default-config"}
     },
+    {
+        'args': (
+            {'meta': {
+                'test_basedir': '/mybasedir',
+                'docker_compose_template': '/tmpl.yml',
+            }},
+        ),
+        'kwargs': {"name": "basedir-set-config"}
+    },
 ]
 
 
 class TTestrun(unittest.TestCase):
-
 
     def test_object_creation_works(self):
         """Check if no errors appear on calling the constructor"""
@@ -44,6 +52,12 @@ class TTestrun(unittest.TestCase):
         self.assertEqual(1, len(t.test_env))
         self.assertEqual('/default-config', t.test_env['test_dir'])
 
+    def test_basedir_setting(self):
+        """Check if the 'test_basedir' configuration is correctly evaluated"""
+        config = configs[3]
+        t = Testrun(*config['args'], **config['kwargs'])
+        self.assertEqual(1, len(t.test_env))
+        self.assertEqual('/mybasedir/basedir-set-config', t.test_env['test_dir'])
 
 if __name__ == "__main__":
     unittest.main()
