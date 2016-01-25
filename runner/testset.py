@@ -4,6 +4,7 @@ from runner.testrun import Testrun
 from tools import deep_merge
 from threading import Thread
 
+
 class Testset(Thread):
 
     def __init__(self, name='default', global_config={}):
