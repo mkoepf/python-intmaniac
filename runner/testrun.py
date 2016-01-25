@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from tools import deep_merge
+from output import output
 
 import os.path
 import threading
@@ -117,6 +118,7 @@ class Testrun(threading.Thread):
         except sp.CalledProcessError as e:
             # we don't re-raise here, that's just the exit from the command
             # loop above
+            self.results.append(e)
             self.success = False
             self.reason = "Failed command"
         return self.success
@@ -124,6 +126,16 @@ class Testrun(threading.Thread):
     def succeeded(self):
         return self.success
 
+    def dump(self):
+        output.test_open(self.name)
+        if not self.success:
+            output.test_failed(type=self.reason,
+                               message=str(self.exception)
+                               if self.exception
+                               else "Test output following",
+                               details="No details available")
+        output.test_stdout("\n".join([r.stdout for r in self.results]))
+        output.test_done()
 
 if __name__ == "__main__":
     print("Don't do this :)")

@@ -2,6 +2,8 @@
 
 from runner.testrun import Testrun
 from tools import deep_merge
+from output import output
+
 from threading import Thread
 
 
@@ -39,7 +41,11 @@ class Testset(Thread):
                 self.success = False
         return self.success
 
-
+    def dump(self):
+        output.test_suite_open(self.name)
+        for test in self.tests:
+            test.dump()
+        output.test_suite_done()
 
 if __name__ == "__main__":
     print("Don't do this :)")
