@@ -4,14 +4,15 @@ output_format: teamcity
 # everything in the global key will be merged into every test, with the test data
 # getting preference.
 global:
-  config:
-    test_container: hub.cognotekt.int:5000/production/testsuite:latest
+  meta:
     docker_compose_template: docker-compose.yml.tmpl
     docker_compose_params: # optional. a list of parameters to docker-compose
     test_service: # REQUIRED. the service in the docker-compose which is executed with tests
     test_commands: # optional. executed one-by-one, all must succeed.
                    # if not given the service will be "run" and expected to return
                    # true (0) or false (1), which will be used as test result
+    test_basedir: # optional, defaults to the directory where the template is in. UNDER
+                  # this directory the test dirs are created.
     run_timeout: 60
     # test_script:  # FUTURE. will be passed to '$test_shell -c "HERE"'.
 # either dict or array allowed.
