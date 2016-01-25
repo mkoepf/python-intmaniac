@@ -46,6 +46,9 @@ class Testrun(threading.Thread):
         self.template_name = os.path.basename(tmpl)
         # auto-add some variables to environment
         self.test_env['test_dir'] = self.test_dir
+        # result evaluation
+        self.success = True
+        self.report = None
 
     def __str__(self):
         return "<runner.Test '%s'>" % self.name
@@ -68,6 +71,8 @@ class Testrun(threading.Thread):
     def run(self):
         self.init_environment()
 
+    def succeeded(self):
+        return self.success
 
 
 if __name__ == "__main__":

@@ -11,6 +11,9 @@ class Testset(Thread):
         self.tests = []
         self.name = name
         self.global_config = global_config
+        self.failed_tests = []
+        self.succeeded_tests = []
+        self.success = True
 
     def set_global_config(self, global_config):
         self.global_config = global_config
@@ -20,10 +23,21 @@ class Testset(Thread):
         self.tests.append(Testrun(deep_merge(global_config, config),
                                   name="%s-%s" % (self.name, name)))
 
+    def succeeded(self):
+        return self.success
+
     def run(self):
         for test in self.tests:
-            print(test)
-        return 0
+            test.start()
+        for test in self.tests:
+            test.join()
+            if test.succeeded():
+                self.succeeded_tests.append(test)
+            else:
+                self.failed_tests.append(test)
+                self.success = False
+        return self.succeeded
+
 
 
 if __name__ == "__main__":

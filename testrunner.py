@@ -78,12 +78,14 @@ def get_test_set_groups():
 
 
 def run_test_set_groups(tsgs):
-    retval = 0
+    retval = True
     for testsetgroup in tsgs:
-        for testset in testsetgroup:
-            retval += testset.run()
-    if not retval == 0:
-        sys.exit(retval)
+        for testsetobj in testsetgroup:
+            testsetobj.start()
+        for testsetobj in testsetgroup:
+            testsetobj.join()
+            retval = testsetobj.succeeded() and retval
+    return retval
 
 
 def prepare_environment(arguments):
@@ -100,4 +102,6 @@ def prepare_environment(arguments):
 
 if __name__ == "__main__":
     prepare_environment(sys.argv)
-    run_test_set_groups(get_test_set_groups())
+    result = run_test_set_groups(get_test_set_groups())
+    if not result:
+        sys.exit(1)
