@@ -31,9 +31,8 @@ class Testrun(threading.Thread):
     configuration, and evaluates the results.
     """
 
-    def __init__(self, test_name, test_definition, *args, **kwargs):
+    def __init__(self, test_definition, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.name = test_name
         self.test_definition = deep_merge(default_config, test_definition)
         # quick shortcuts
         self.test_env = self.test_definition['environment']

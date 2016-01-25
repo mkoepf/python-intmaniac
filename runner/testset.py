@@ -17,8 +17,8 @@ class Testset(Thread):
 
     def add_from_config(self, name, config, global_config=None):
         global_config = global_config if global_config else self.global_config
-        self.tests.append(Testrun("%s-%s" % (self.name, name),
-                                  deep_merge(global_config, config)))
+        self.tests.append(Testrun(deep_merge(global_config, config),
+                                  name="%s-%s" % (self.name, name)))
 
     def run(self):
         for test in self.tests:
