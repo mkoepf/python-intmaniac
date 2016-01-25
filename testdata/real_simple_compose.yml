@@ -1,0 +1,4 @@
+# most simple compose template for running "tests" against
+
+test-service:
+  image: busybox
