@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 from pip.req import parse_requirements
 from pip.download import PipSession
 
-VERSION = "0.2.7"
+VERSION = "0.2.8"
 
 
 install_reqs = parse_requirements("./requirements.txt", session=PipSession())
