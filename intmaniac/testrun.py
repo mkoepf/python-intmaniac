@@ -9,12 +9,14 @@ import shutil
 import logging as log
 import subprocess as sp
 import os
+from sys import version_info as vinf
 from os.path import basename, join, isabs, realpath, dirname
 from re import sub as resub
 
 
 default_commandline_start = ["docker-compose", "run"]
 default_commandline_end = []
+python_version = 10 * vinf[0] + vinf[1]
 
 default_config = {
     'environment': {},
@@ -32,6 +34,23 @@ default_config = {
         'test_report_files': None,
     },
 }
+
+
+log.debug("Python version %.2f detected" % python_version)
+
+
+class DummyCompletedProcess:
+    """Poor man's Pyton 2.7 CompletedProcess replacement"""
+
+    def __init__(self):
+        self.args = []
+        self.returncode = -1
+        self.stdout = None
+        self.stderr = None
+
+    def __str__(self):
+        return "<DummyCompletedProcess: %s (%d)" % \
+               (" ".join(self.args), self.returncode)
 
 
 class Testrun(threading.Thread):
@@ -115,14 +134,27 @@ class Testrun(threading.Thread):
             ofile.write(tpl)
 
     def run_test_command(self, command=None):
+        """:param command the command to execute as array"""
         if not command:
-            command = []
-        self.results.append(sp.run(
-            self.commandline + command,
-            check=True,
-            stdout=sp.PIPE, stderr=sp.STDOUT,
-            universal_newlines=True,
-        ))
+            command = self.commandline
+        else:
+            command = self.commandline + command
+        if python_version >= 35:
+            rv = sp.run(
+                command,
+                check=True,
+                stdout=sp.PIPE, stderr=sp.STDOUT,
+                universal_newlines=True,
+            )
+        else:
+            p = sp.Popen(command, stdout=sp.PIPE, stderr=sp.STDOUT)
+            stdout, _ = p.communicate()
+            rv = DummyCompletedProcess()
+            rv.args = command
+            rv.returncode = p.returncode
+            rv.stdout = stdout
+            rv.stderr = None
+        self.results.append(rv)
         return self.results[-1]
 
     def run(self):
