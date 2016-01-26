@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from setuptools import setup
+from setuptools import setup, find_packages
 from pip.req import parse_requirements
 from pip.download import PipSession
 
@@ -12,7 +12,7 @@ reqs = [str(ir.req) for ir in install_reqs]
 
 setup(
     name             = 'intmaniac',
-    packages         = ['intmaniac'],
+    packages         = find_packages(),
     version          = VERSION,
     description      = 'A generic integration test tool utilizing docker-compose (for now)',
     author           = 'Axel Bock',
