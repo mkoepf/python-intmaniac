@@ -63,17 +63,19 @@ def get_test_set_groups(setupdata):
 def get_and_init_configuration():
 
     def get_setupdata():
+        stub = get_full_config_stub()
+        filedata = None
         try:
-            stub = get_full_config_stub()
             with open(config.config_file, "r") as ifile:
                 filedata = yaml.safe_load(ifile)
-            return tools.deep_merge(stub, filedata)
         except IOError as e:
             # FileNotFoundError is python3 only. yihah.
             if e.errno == ENOENT:
                 fail("Could not find configuration file: %s" % config.config_file)
             else:
                 fail("Unspecified IO error: %s" % str(e))
+        log.info("Read configuration file %s" % config.config_file)
+        return tools.deep_merge(stub, filedata)
 
     def prepare_global_config(setupdata):
         global_config = setupdata['global']
@@ -120,7 +122,7 @@ def prepare_environment(arguments):
                         default=0,
                         action="count")
     config = parser.parse_args(arguments)
-    log.basicConfig(level=loglevels[config.verbose])
+    log.basicConfig(level=loglevels[min(len(loglevels)-1, config.verbose)])
 
 
 def console_entrypoint():

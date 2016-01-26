@@ -6,6 +6,7 @@ from intmaniac.output import output
 import copy
 import threading
 import shutil
+import logging as log
 import subprocess as sp
 import os
 from os.path import basename, join, isabs, realpath, dirname
@@ -91,6 +92,7 @@ class Testrun(threading.Thread):
         return self.__str__()
 
     def init_environment(self):
+        log.debug("creating test directory %s" % self.test_dir)
         shutil.rmtree(self.test_dir, ignore_errors=True)
         os.makedirs(self.test_dir)
         os.chdir(self.test_dir)
