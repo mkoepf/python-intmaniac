@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import unittest
-from runner.testrun import Testrun
+from intmaniac.testrun import Testrun
 
 configs = [
     {

@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-from runner.testrun import Testrun
-from tools import deep_merge
-from output import output
+from intmaniac.testrun import Testrun
+from intmaniac.tools import deep_merge
+from intmaniac.output import output
 
 from threading import Thread
 

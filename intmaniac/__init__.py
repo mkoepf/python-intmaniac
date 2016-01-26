@@ -2,12 +2,12 @@
 
 import yaml
 
-from runner.testset import Testset
+from intmaniac.testset import Testset
 
 import sys
 from argparse import ArgumentParser
-import tools
-from output import init_output
+from intmaniac import tools
+from intmaniac.output import init_output
 import os
 
 config = None
@@ -108,7 +108,7 @@ def prepare_environment(arguments):
     config = parser.parse_args(arguments)
 
 
-if __name__ == "__main__":
+def console_entrypoint():
     prepare_environment(sys.argv)
     configuration = get_and_init_configuration()
     result = run_test_set_groups(get_test_set_groups(configuration))

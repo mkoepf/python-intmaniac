@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 import unittest
-from runner.testset import Testset
-from runner.testrun import Testrun
+from intmaniac.testset import Testset
+from intmaniac.testrun import Testrun
 
 
 class TTestset(unittest.TestCase):

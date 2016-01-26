@@ -1,6 +1,14 @@
+# pip / setuptools stuff
+dist/
+MANIFEST
+*.egg-info
+build/
+
+# project data
 ignoreme/
 *.pyc
+
+# ide files
 *.sublime-*
 .idea/
-
 

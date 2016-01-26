@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-from tools import deep_merge
-from output import output
+from intmaniac.tools import deep_merge
+from intmaniac.output import output
 
 import os.path
 import threading

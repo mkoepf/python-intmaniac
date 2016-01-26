@@ -1,8 +1,8 @@
 #!/usr/bin/env pythpn
 
 import unittest
-from testrunner import prepare_environment, get_test_set_groups
-from testrunner import get_and_init_configuration
+from intmaniac import prepare_environment, get_test_set_groups
+from intmaniac import get_and_init_configuration
 
 
 class TestTemplateEmpty(unittest.TestCase):
