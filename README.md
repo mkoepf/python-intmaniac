@@ -11,10 +11,20 @@ The idea is that you have a program / service / thing, which has to be integrati
 For an example of a possible configuration see below.
 
 
+## How this works
+
+For most products you want to test them embedded in a system of connected components. For example if you use a database, it might be good to know with which versions of the database your product works, or that your latest build has still the same API functionality than your stable branch.
+
+`intmaniac` enables you to write a parameterized `docker-compose`` template which describes your full test environment, and then run tests against it.
+
+It is assumed that one container in your composition contains a test tool of the system, which is then executed with one or more commands. For this the testing container (the default name is `test-service`) is executed by intmania with a set of user-defined commands. `docker-compose` should bring up all dependent services on the first execution of the `docker-compose run` command.
+
+*NOTE:* The tests are executed on the same host, all in parallel. You should have enough resources to ensure successful execution :) . If not, you can layer the test set defintions in an array, where all test sets in the outer array are executed sequentially. (see example at the bottom)
+
 ## Configuration examples
 
 
-### juggler.yaml
+### intmaniac.yaml
 
     ---
     version: 1.0            # no effect so far
@@ -31,44 +41,74 @@ For an example of a possible configuration see below.
       # this is a test group. the config settings under "global" above are
       # applied unless overwritten by the unique tests
 
-      database-tests:
+      database-psql:        # a test set, contains tests
 
-        # this is a test
-        postgres95:      # this is a test
+        postgres95:         # this is a test
           environment:
             DB_CONTAINER: postgres:9.5
 
-        postgres94:
+        postgres94:         # and another
           environment:
             DB_CONTAINER: postgres:9.4
 
-        # another test group, with another test
-        mariadb:
+      database-maria:       # another test set
 
-          maria10:
-            environment:
-              DB_CONTAINER: maria:v10.0
-              DB_PORT: 1111
-              DB_TYPE: mysql
-            meta:
-              allow_failure: true
+        maria10:            # with another test
+          environment:
+            DB_CONTAINER: maria:v10.0
+            DB_PORT: 1111
+            DB_TYPE: mysql
+          meta:
+            allow_failure: true
 
-        config-test:
+      configurations:   # aand another test set
 
-          # This test will override the global CONFIG_CONTAINER setting
-          # and will happen with postgres 9.3
-          latest: { environment: { CONFIG_CONTAINER: my_config:latest } }
+        latest:
+          environment:
+            CONFIG_CONTAINER: my_config:latest
 
 
 ### docker-compose.yml
 
+    # test-service is the default name. if you change it, you have
+    # to set the meta.test_service key accordingly.
+    test-service:
+
+      image: my_company_hub/tests/runner
+
+      # this is necessary to force docker-compose to create and start
+      # the other services when starting test-service
+      links:
+        - test-me:test-me
+
     test-me:
-      image: %%TEST_CONTAINER%%
+      image: my_company_hub/%%TEST_CONTAINER%%
       environment:
         - DB_TYPE=%%DB_TYPE%%
         - DB_HOST=db
         - DB_PORT=%%DB_PORT%%
       links:
         - db:db
+
     db:
-      image: %%DB_CONTAINER%%
+      image: my_company_hub/%%DB_CONTAINER%%
+
+
+### intmaniac.yaml - sequential execution
+
+If you want sequential execution of test(sets), then you can define multiple test set groups in an array. The test sets in this array are executed sequentially, and if the first set fails the second set is not executed.
+
+    version: 1.0
+    global: {}
+    testsets:
+      - testset1:
+          testone:
+            environment: {}
+          testtwo:
+            environment: {}
+        testset2:
+          testthree:
+            environment: {}
+      - testset3:
+          testfour:
+            environment: {}
