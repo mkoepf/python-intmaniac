@@ -9,7 +9,7 @@ import unittest
 class TestTemplateEmpty(unittest.TestCase):
 
     def setUp(self):
-        prepare_environment("-c ../testdata/testconfig_empty.yaml".split())
+        prepare_environment("-c testdata/testconfig_empty.yaml".split())
         config = get_and_init_configuration()
         self.tsgs = get_test_set_groups(config)
 
@@ -24,7 +24,7 @@ class TestTemplateEmpty(unittest.TestCase):
 class TestTemplateArrayTriple(unittest.TestCase):
 
     def setUp(self):
-        prepare_environment("-c ../testdata/testconfig_array_triple.yaml".split())
+        prepare_environment("-c testdata/testconfig_array_triple.yaml".split())
         config = get_and_init_configuration()
         self.tsgs = get_test_set_groups(config)
 
@@ -63,7 +63,7 @@ class TestTemplateArrayTriple(unittest.TestCase):
 class TestTemplateKeysTriple(unittest.TestCase):
 
     def setUp(self):
-        prepare_environment("-c ../testdata/testconfig_keys_triple.yaml".split())
+        prepare_environment("-c testdata/testconfig_keys_triple.yaml".split())
         config = get_and_init_configuration()
         self.tsgs = get_test_set_groups(config)
 

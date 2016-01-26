@@ -22,7 +22,7 @@ class TestSimpleExecution(unittest.TestCase):
 
     def setUp(self):
         self.save_dir = os.getcwd()
-        base_dir = os.path.realpath("../ignoreme/real-test1")
+        base_dir = os.path.realpath("ignoreme/real-test1")
         self.base_cmdline = [
             'docker-compose', 'run', '-e',
             "test_dir=%s" % base_dir,
@@ -33,7 +33,7 @@ class TestSimpleExecution(unittest.TestCase):
 
     @unittest.skipUnless(mock_available, "No mocking available in this Python version")
     def test_single_container_setup(self):
-        prepare_environment("-c ../testdata/real_simple_config.yaml".split())
+        prepare_environment("-c testdata/real_simple_config.yaml".split())
         config = get_and_init_configuration()
         tsgs = get_test_set_groups(config)
         with patch("intmaniac.testrun.sp.run") as mock:
