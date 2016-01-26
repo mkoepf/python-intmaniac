@@ -4,13 +4,19 @@ from intmaniac.testrun import Testrun
 from intmaniac.tools import deep_merge
 from intmaniac.output import output
 
+import logging as log
 from threading import Thread
 
 
 class Testset(Thread):
 
+    def __repr__(self):
+        return "<Testset '%s'>" % self.name
+
     def __init__(self, global_config={}, *args, **kwargs):
         super(Testset, self).__init__(*args, **kwargs)
+        self.log = log.getLogger(self.name)
+        self.log.debug("Instantiated")
         self.tests = []
         self.name = kwargs['name'] if kwargs.get('name') else "default"
         self.global_config = global_config
@@ -31,14 +37,17 @@ class Testset(Thread):
 
     def run(self):
         for test in self.tests:
+            log.debug("starting test <%s>" % test.name)
             test.start()
         for test in self.tests:
             test.join()
+            log.debug("joined test <%s>" % test.name)
             if test.succeeded():
                 self.succeeded_tests.append(test)
             else:
                 self.failed_tests.append(test)
                 self.success = False
+        self.log.warn("testset successful" if self.success else "testset FAILED")
         return self.success
 
     def dump(self):

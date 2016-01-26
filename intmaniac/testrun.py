@@ -41,6 +41,8 @@ class Testrun(threading.Thread):
 
     def __init__(self, test_definition, *args, **kwargs):
         super(Testrun, self).__init__(*args, **kwargs)
+        self.log = log.getLogger(self.name)
+        self.log.debug("Instantiated")
         test_definition = deep_merge(default_config, test_definition)
         # quick shortcuts
         self.test_env = test_definition['environment']
@@ -84,6 +86,12 @@ class Testrun(threading.Thread):
         self.results = []
         self.exception = None
         self.reason = None
+        # some debug output
+        self.log.info("base commandline '%s'" % " ".join(self.commandline))
+        self.log.debug("test directory '%s'" % self.test_dir)
+        self.log.debug("template path '%s'" % self.template)
+        for key, val in self.test_env.items():
+            self.log.debug("env %s=%s" % (key, val))
 
     def __str__(self):
         return "<runner.Test '%s'>" % self.name
@@ -92,7 +100,7 @@ class Testrun(threading.Thread):
         return self.__str__()
 
     def init_environment(self):
-        log.debug("creating test directory %s" % self.test_dir)
+        self.log.debug("creating test directory %s" % self.test_dir)
         shutil.rmtree(self.test_dir, ignore_errors=True)
         os.makedirs(self.test_dir)
         os.chdir(self.test_dir)
@@ -122,7 +130,9 @@ class Testrun(threading.Thread):
             self.init_environment()
             if len(self.test_meta['test_commands']) > 0:
                 for cmd in self.test_meta['test_commands']:
-                    self.run_test_command(cmd.split(" "))
+                    cmd = cmd.split(" ") if type(cmd) == str else cmd
+                    self.log.info("command '%s'" % " ".join(cmd))
+                    self.run_test_command(cmd)
             else:
                 self.run_test_command()
         except IOError as e:
@@ -134,9 +144,12 @@ class Testrun(threading.Thread):
         except sp.CalledProcessError as e:
             # we don't re-raise here, that's just the exit from the command
             # loop above
+            self.log.info("command FAILED.")
+            self.log.debug("command output: %s" % e.stdout.strip())
             self.results.append(e)
             self.success = False
             self.reason = "Failed command"
+        self.log.warn("test successful" if self.success else "test FAILED")
         return self.success
 
     def succeeded(self):

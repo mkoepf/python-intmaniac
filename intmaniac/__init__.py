@@ -11,7 +11,7 @@ import logging as log
 from errno import *
 from argparse import ArgumentParser
 
-loglevels = [log.ERROR, log.WARNING, log.INFO, log.DEBUG]
+loglevels = [10000, log.ERROR, log.WARNING, log.INFO, log.DEBUG]
 config = None
 
 
@@ -100,11 +100,23 @@ def get_and_init_configuration():
 def run_test_set_groups(tsgs):
     retval = True
     for testsetgroup in tsgs:
+        if not retval:
+            # just for nicer output
+            for tso in testsetgroup:
+                log.warning("skipping %s because of failed dependency" % tso)
+            continue
+        # everything in here is run in parallel
         for testsetobj in testsetgroup:
             testsetobj.start()
         for testsetobj in testsetgroup:
             testsetobj.join()
             retval = testsetobj.succeeded() and retval
+            if not testsetobj.succeeded():
+                log.critical("%s failed, skipping following testsets"
+                             % testsetobj)
+        if not retval:
+            # one test set failed. we abort.
+            break
     return retval
 
 
@@ -122,7 +134,8 @@ def prepare_environment(arguments):
                         default=0,
                         action="count")
     config = parser.parse_args(arguments)
-    log.basicConfig(level=loglevels[min(len(loglevels)-1, config.verbose)])
+    llevel = loglevels[min(len(loglevels)-1, config.verbose)]
+    log.basicConfig(level=llevel)
 
 
 def console_entrypoint():
