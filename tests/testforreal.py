@@ -4,11 +4,9 @@ from intmaniac import prepare_environment, get_test_set_groups
 from intmaniac import get_and_init_configuration
 
 import unittest
-from unittest.mock import patch
 import os
-
-# for the tests
 import subprocess as sp
+from unittest.mock import patch
 
 
 class TestSimpleExecution(unittest.TestCase):

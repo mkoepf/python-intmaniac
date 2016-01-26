@@ -5,9 +5,9 @@ from intmaniac.output import output
 
 import os.path
 import threading
-from re import sub as resub
 import shutil
 import subprocess as sp
+from re import sub as resub
 
 
 default_commandline_start = ["docker-compose", "run"]

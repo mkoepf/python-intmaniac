@@ -3,12 +3,12 @@
 import yaml
 
 from intmaniac.testset import Testset
+from intmaniac import tools
+from intmaniac.output import init_output
 
 import sys
 from argparse import ArgumentParser
-from intmaniac import tools
-from intmaniac.output import init_output
-import os
+
 
 config = None
 

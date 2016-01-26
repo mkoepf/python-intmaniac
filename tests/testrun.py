@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 
-import unittest
 from intmaniac.testrun import Testrun
+
+import unittest
+
 
 configs = [
     {
