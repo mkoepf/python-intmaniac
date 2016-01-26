@@ -77,6 +77,9 @@ def get_and_init_configuration():
 
     def prepare_global_config(setupdata):
         global_config = setupdata['global']
+        # add config file location
+        global_config['meta']['_configfile'] = config.config_file
+        # add env settings from command line
         if config.env:
             for tmp in config.env:
                 try:

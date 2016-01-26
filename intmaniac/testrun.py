@@ -4,10 +4,11 @@ from intmaniac.tools import deep_merge
 from intmaniac.output import output
 
 import copy
-import os.path
 import threading
 import shutil
 import subprocess as sp
+import os
+from os.path import basename, join, isabs, realpath, dirname
 from re import sub as resub
 
 
@@ -43,16 +44,25 @@ class Testrun(threading.Thread):
         # quick shortcuts
         self.test_env = test_definition['environment']
         self.test_meta = test_definition['meta']
-        # start initializing variables - directories and file names
-        tmpl = self.test_meta['docker_compose_template']
-        self.template = os.path.realpath(tmpl)
-        if self.test_meta.get('test_basedir'):
-            self.base_dir = os.path.realpath(self.test_meta['test_basedir'])
-        else:
-            self.base_dir = os.path.dirname(self.template)
+        # okay.
+        # let's keep all file references relative to the configuration
+        # file. easy to remember.
+        configfilepath = realpath(dirname(self.test_meta.get('_configfile',
+                                                             './dummy')))
+        # self.TEMPLATE / .TEMPLATE_NAME
+        tmp = self.test_meta['docker_compose_template']
+        if not isabs(tmp):
+            tmp = realpath(join(configfilepath, tmp))
+        self.template = tmp
+        self.template_name = basename(self.template)
+        # self.BASEDIR
+        tmp = self.test_meta.get('test_basedir', configfilepath)
+        if not isabs(tmp):
+            tmp = realpath(join(configfilepath, tmp))
+        self.base_dir = tmp
+        # self.SANITIZED_NAME, .TEST_DIR
         self.sanitized_name = resub("[^a-zA-Z0-9_]", "-", self.name)
-        self.test_dir = os.path.join(self.base_dir, self.sanitized_name)
-        self.template_name = os.path.basename(tmpl)
+        self.test_dir = join(self.base_dir, self.sanitized_name)
         # extend SELF.TEST_ENV with TEST_DIR
         self.test_env['test_dir'] = self.test_dir
         #### create SELF.COMMANDLINE
