@@ -110,11 +110,11 @@ def prepare_environment(arguments):
     parser.add_argument("-e", "--env",
                         help="dynamically add a value to the environment",
                         action="append")
-    config = parser.parse_args(arguments[1:])
+    config = parser.parse_args(arguments)
 
 
 def console_entrypoint():
-    prepare_environment(sys.argv)
+    prepare_environment(sys.argv[1:])
     configuration = get_and_init_configuration()
     result = run_test_set_groups(get_test_set_groups(configuration))
     if not result:
