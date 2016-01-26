@@ -6,7 +6,16 @@ from intmaniac import get_and_init_configuration
 import unittest
 import os
 import subprocess as sp
-from unittest.mock import patch
+
+# this is python3 testing only.
+# so let's make sure this is not executed on python2
+# that sucks *so* much.
+mock_available = False
+try:
+    from unittest.mock import patch
+    mock_available = True
+except ImportError:
+    patch = None
 
 
 class TestSimpleExecution(unittest.TestCase):
@@ -22,6 +31,7 @@ class TestSimpleExecution(unittest.TestCase):
     def tearDown(self):
         os.chdir(self.save_dir)
 
+    @unittest.skipUnless(mock_available, "No mocking available in this Python version")
     def test_single_container_setup(self):
         prepare_environment("-c ../testdata/real_simple_config.yaml".split())
         config = get_and_init_configuration()

@@ -3,6 +3,7 @@
 from intmaniac.tools import deep_merge
 from intmaniac.output import output
 
+import copy
 import os.path
 import threading
 import shutil
@@ -37,7 +38,7 @@ class Testrun(threading.Thread):
     """
 
     def __init__(self, test_definition, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(Testrun, self).__init__(*args, **kwargs)
         test_definition = deep_merge(default_config, test_definition)
         # quick shortcuts
         self.test_env = test_definition['environment']
@@ -55,14 +56,14 @@ class Testrun(threading.Thread):
         # extend SELF.TEST_ENV with TEST_DIR
         self.test_env['test_dir'] = self.test_dir
         #### create SELF.COMMANDLINE
-        self.commandline = default_commandline_start.copy()
+        self.commandline = copy.copy(default_commandline_start)
         for param in self.test_meta['docker_compose_params']:
             self.commandline.append(param)
         for key, val in self.test_env.items():
             self.commandline.append("-e")
             self.commandline.append("%s=%s" % (key, val))
         self.commandline.append("--rm")
-        self.commandline.extend(default_commandline_end.copy())
+        self.commandline.extend(copy.copy(default_commandline_end))
         self.commandline.append(self.test_meta['test_service'])
         # sanitize SELF.TEST_META['test_commands']
         if type(self.test_meta['test_commands']) == str:

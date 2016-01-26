@@ -9,10 +9,10 @@ from threading import Thread
 
 class Testset(Thread):
 
-    def __init__(self, name='default', global_config={}):
-        super().__init__()
+    def __init__(self, global_config={}, *args, **kwargs):
+        super(Testset, self).__init__(*args, **kwargs)
         self.tests = []
-        self.name = name
+        self.name = kwargs['name'] if kwargs.get('name') else "default"
         self.global_config = global_config
         self.failed_tests = []
         self.succeeded_tests = []

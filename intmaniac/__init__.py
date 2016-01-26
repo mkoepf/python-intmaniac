@@ -50,7 +50,7 @@ def get_test_set_groups(setupdata):
             tsglobal = tools.deep_merge(
                 global_config,
                 tests.pop("_global", get_test_config_stub()))
-            ts = Testset(name=tsname, global_config=tsglobal)
+            ts = Testset(global_config=tsglobal, name=tsname)
             tsgroup_list.append(ts)
             for test_name, test_config in tests.items():
                 ts.add_from_config(test_name, test_config)
@@ -62,9 +62,9 @@ def get_and_init_configuration():
 
     def get_setupdata():
         try:
-            return \
-                {**get_full_config_stub(),
-                 **yaml.safe_load(open(config.config_file, "r"))}
+            stub = get_full_config_stub()
+            filedata = yaml.safe_load(open(config.config_file, "r"))
+            return tools.deep_merge(stub, filedata)
         except FileNotFoundError:
             fail("Could not find configuration file: %s" % config.config_file)
 

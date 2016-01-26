@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+import sys
+
+
 output = None
 
 
@@ -66,7 +69,8 @@ class GenericOutput:
 
     @staticmethod
     def dump(*args):
-        print(*args)
+        sys.stdout.write(*args)
+        sys.stdout.write("\n")
 
 
 class TeamcityOutput(GenericOutput):
