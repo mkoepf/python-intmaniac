@@ -110,7 +110,7 @@ def prepare_environment(arguments):
     parser.add_argument("-e", "--env",
                         help="dynamically add a value to the environment",
                         action="append")
-    config = parser.parse_args(arguments)
+    config = parser.parse_args(arguments[1:])
 
 
 def console_entrypoint():
