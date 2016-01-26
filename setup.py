@@ -1,9 +1,14 @@
 #!/usr/bin/env python
 
 from setuptools import setup
-
+from pip.req import parse_requirements
+from pip.download import PipSession
 
 VERSION = "0.2.0"
+
+
+install_reqs = parse_requirements("./requirements.txt", session=PipSession())
+reqs = [str(ir.req) for ir in install_reqs]
 
 setup(
     name             = 'intmaniac',
@@ -15,7 +20,7 @@ setup(
     url              = 'https://github.com/flypenguin/python-intmaniac',
     download_url     = 'https://github.com/flypenguin/python-intmaniac/tarball/{}'.format(VERSION),
     keywords         = 'integrationtest sysadmin devops ci cd',
-    install_requires = ['PyYAML', ],
+    install_requires = reqs,
     entry_points     = {
         'console_scripts': [
             'intmaniac=intmaniac:console_entrypoint',
