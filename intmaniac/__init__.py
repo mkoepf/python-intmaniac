@@ -99,6 +99,7 @@ def get_and_init_configuration():
 
 def run_test_set_groups(tsgs):
     retval = True
+    dumps = []
     for testsetgroup in tsgs:
         if not retval:
             # just for nicer output
@@ -111,12 +112,13 @@ def run_test_set_groups(tsgs):
         for testsetobj in testsetgroup:
             testsetobj.join()
             retval = testsetobj.succeeded() and retval
+            dumps.append(testsetobj.dump)
             if not testsetobj.succeeded():
                 log.critical("%s failed, skipping following testsets"
                              % testsetobj)
-        if not retval:
-            # one test set failed. we abort.
-            break
+    print("TEST PROTOCOL")
+    for dump_function in dumps:
+        dump_function()
     return retval
 
 
