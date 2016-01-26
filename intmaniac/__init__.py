@@ -119,3 +119,7 @@ def console_entrypoint():
     result = run_test_set_groups(get_test_set_groups(configuration))
     if not result:
         sys.exit(1)
+
+
+if __name__ == "__main__":
+    console_entrypoint()
