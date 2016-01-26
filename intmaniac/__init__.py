@@ -64,7 +64,8 @@ def get_and_init_configuration():
     def get_setupdata():
         try:
             stub = get_full_config_stub()
-            filedata = yaml.safe_load(open(config.config_file, "r"))
+            with open(config.config_file, "r") as ifile:
+                filedata = yaml.safe_load(ifile)
             return tools.deep_merge(stub, filedata)
         except IOError as e:
             # FileNotFoundError is python3 only. yihah.

@@ -85,12 +85,14 @@ class Testrun(threading.Thread):
         os.makedirs(self.test_dir)
         os.chdir(self.test_dir)
         # TODO - catch & error handling if template cannot be found.
-        tpl = open(self.template, "r").read()
+        with open(self.template, "r") as ifile:
+            tpl = ifile.read()
         for key, val in self.test_env.items():
             tpl = tpl.replace("%%%%%s%%%%" % key.upper(), val)
         # TODO (maybe) - catch and error handling if new tmpl cannot be written
-        open(os.path.join(self.test_dir,
-                          "docker-compose.yml"), "w").write(tpl)
+        with open(os.path.join(self.test_dir,
+                               "docker-compose.yml"), "w") as ofile:
+            ofile.write(tpl)
 
     def run_test_command(self, command=[]):
         self.results.append(sp.run(
