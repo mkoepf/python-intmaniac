@@ -7,15 +7,16 @@ from intmaniac import tools
 from intmaniac.output import init_output
 
 import sys
+import logging as log
 from errno import *
 from argparse import ArgumentParser
 
-
+loglevels = [log.ERROR, log.WARNING, log.INFO, log.DEBUG]
 config = None
 
 
 def fail(errormessage):
-    print("ERROR: %s" % errormessage)
+    log.critical("%s" % errormessage)
     sys.exit(-10)
 
 
@@ -111,7 +112,12 @@ def prepare_environment(arguments):
     parser.add_argument("-e", "--env",
                         help="dynamically add a value to the environment",
                         action="append")
+    parser.add_argument("-v", "--verbose",
+                        help="increase verbosity level, use multiple times",
+                        default=0,
+                        action="count")
     config = parser.parse_args(arguments)
+    log.basicConfig(level=loglevels[config.verbose])
 
 
 def console_entrypoint():
