@@ -104,7 +104,9 @@ class Testrun(threading.Thread):
                                "docker-compose.yml"), "w") as ofile:
             ofile.write(tpl)
 
-    def run_test_command(self, command=[]):
+    def run_test_command(self, command=None):
+        if not command:
+            command = []
         self.results.append(sp.run(
             self.commandline + command,
             check=True,
