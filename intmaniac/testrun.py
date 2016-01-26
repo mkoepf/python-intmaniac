@@ -111,7 +111,7 @@ class Testrun(threading.Thread):
                     self.run_test_command(cmd.split(" "))
             else:
                 self.run_test_command()
-        except FileNotFoundError as e:
+        except IOError as e:
             self.exception = e
             self.success = False
             self.reason = "Exception"
