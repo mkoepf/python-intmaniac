@@ -106,7 +106,7 @@ def prepare_environment(arguments):
     parser = ArgumentParser()
     parser.add_argument("-c", "--config-file",
                         help="specify configuration file",
-                        default="./testrunner.yaml")
+                        default="./intmaniac.yaml")
     parser.add_argument("-e", "--env",
                         help="dynamically add a value to the environment",
                         action="append")
