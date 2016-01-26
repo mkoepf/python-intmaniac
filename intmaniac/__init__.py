@@ -7,6 +7,7 @@ from intmaniac import tools
 from intmaniac.output import init_output
 
 import sys
+from errno import *
 from argparse import ArgumentParser
 
 
@@ -65,8 +66,12 @@ def get_and_init_configuration():
             stub = get_full_config_stub()
             filedata = yaml.safe_load(open(config.config_file, "r"))
             return tools.deep_merge(stub, filedata)
-        except FileNotFoundError:
-            fail("Could not find configuration file: %s" % config.config_file)
+        except IOError as e:
+            # FileNotFoundError is python3 only. yihah.
+            if e.errno == ENOENT:
+                fail("Could not find configuration file: %s" % config.config_file)
+            else:
+                fail("Unspecified IO error: %s" % str(e))
 
     def prepare_global_config(setupdata):
         global_config = setupdata['global']
