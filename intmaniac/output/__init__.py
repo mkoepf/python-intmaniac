@@ -11,6 +11,7 @@ class OutputException(Exception):
 
 
 class GenericOutput:
+    str_message = "{message} (status: {status}, details: {details})"
     str_test_suite_open = "### TEST SUITE: {name}"
     str_test_suite_done = "### /TEST SUITE: {name}"
     str_test_open = "## TEST: {name}"
@@ -25,6 +26,13 @@ class GenericOutput:
         self.open_tests = []
         self.open_test_suits = []
         self.open_blocks = []
+
+    # generic message
+
+    def message(self, s, details='-', status='-'):
+        self.dump(self.str_message.format(message=s,
+                                          details=details,
+                                          status=status))
 
     # generic grouping of output
 
@@ -51,7 +59,7 @@ class GenericOutput:
         self.open_tests.append(s)
 
     def test_stdout(self, s):
-        self.dump(self.str_test_stdout.format(text=s))
+        self.dump(self.str_test_stdout.format(text=s.strip()))
 
     def test_stderr(self, s):
         self.dump(self.str_test_stderr.format(text=s))
@@ -74,6 +82,7 @@ class GenericOutput:
 
 
 class TeamcityOutput(GenericOutput):
+    str_message = "##teamcity[message text='{message}' errorDetails='{details}' status='{status}']"
     str_test_suite_open = "##teamcity[testSuiteStarted name='{name}']"
     str_test_suite_done = "##teamcity[testSuiteFinished name='{name}']"
     str_test_open = "##teamcity[testStarted name='{name}']"

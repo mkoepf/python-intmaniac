@@ -185,6 +185,7 @@ class Testrun(threading.Thread):
 
     def dump(self):
         output.test_open(self.name)
+        output.message("Success", status=self.state)
         if not self.succeeded():
             output.test_failed(type=self.reason,
                                message=str(self.exception)
