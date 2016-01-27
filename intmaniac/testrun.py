@@ -94,10 +94,10 @@ class Testrun(threading.Thread):
             self.log.debug("env %s=%s" % (key, val))
 
     def __str__(self):
-        return "<runner.Test '%s'>" % self.name
+        return "<runner.Test '%s' (%s)>" % (self.name, self.state)
 
     def __repr__(self):
-        return self.__str__()
+        return "%s, state '%s'" % (self.name, self.state)
 
     def init_environment(self):
         self.log.debug("creating test directory %s" % self.test_dir)
