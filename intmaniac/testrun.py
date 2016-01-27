@@ -36,9 +36,6 @@ default_config = {
 }
 
 
-log.debug("Python version %.2f detected" % python_version)
-
-
 class DummyCompletedProcess:
     """Poor man's Pyton 2.7 CompletedProcess replacement"""
 
