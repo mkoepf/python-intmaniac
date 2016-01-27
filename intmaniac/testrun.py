@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from intmaniac.tools import deep_merge
+from intmaniac.tools import deep_merge, run_command
 from intmaniac.output import output
 
 import copy
@@ -9,14 +9,12 @@ import shutil
 import logging as log
 import subprocess as sp
 import os
-from sys import version_info as vinf
 from os.path import basename, join, isabs, realpath, dirname
 from re import sub as resub
 
 
 default_commandline_start = ["docker-compose", "run"]
 default_commandline_end = []
-python_version = 10 * vinf[0] + vinf[1]
 
 default_config = {
     'environment': {},
@@ -34,20 +32,6 @@ default_config = {
         'test_report_files': None,
     },
 }
-
-
-class DummyCompletedProcess:
-    """Poor man's Pyton 2.7 CompletedProcess replacement"""
-
-    def __init__(self):
-        self.args = []
-        self.returncode = -1
-        self.stdout = None
-        self.stderr = None
-
-    def __str__(self):
-        return "<DummyCompletedProcess: %s (%d)" % \
-               (" ".join(self.args), self.returncode)
 
 
 class Testrun(threading.Thread):
@@ -130,29 +114,31 @@ class Testrun(threading.Thread):
                                "docker-compose.yml"), "w") as ofile:
             ofile.write(tpl)
 
-    def run_test_command(self, command=None):
+    def run_test_command(self, command=None, use_base_command=True):
         """:param command the command to execute as array"""
         if not command:
             command = self.commandline
         else:
             command = self.commandline + command
-        if python_version >= 35:
-            rv = sp.run(
-                command,
-                check=True,
-                stdout=sp.PIPE, stderr=sp.STDOUT,
-                universal_newlines=True,
-            )
-        else:
-            p = sp.Popen(command, stdout=sp.PIPE, stderr=sp.STDOUT)
-            stdout, _ = p.communicate()
-            rv = DummyCompletedProcess()
-            rv.args = command
-            rv.returncode = p.returncode
-            rv.stdout = stdout
-            rv.stderr = None
+        rv = run_command(command)
         self.results.append(rv)
-        return self.results[-1]
+
+    def cleanup(self):
+        cleanup = True
+        for cmd in ("docker-compose kill", "docker-compose rm"):
+            try:
+                self.log.debug("cleanup command: %s" % cmd)
+                rv = run_command(cmd.split(" "))
+            except sp.CalledProcessError as e:
+                rv = e
+                cleanup = False
+            if not rv.returncode == 0:
+                self.log.warning("cleanup command '%s' failed. code %d, output: %s"
+                                 % (" ".join(rv.args),
+                                    rv.returncode,
+                                    str(rv.stdout)))
+        if not cleanup:
+            self.log.error("cleanup failed")
 
     def run(self):
         try:
@@ -178,6 +164,8 @@ class Testrun(threading.Thread):
             self.results.append(e)
             self.success = False
             self.reason = "Failed command"
+        finally:
+            self.cleanup()
         self.log.warning("test successful" if self.success else "test FAILED")
         return self.success
 

@@ -13,9 +13,10 @@ import subprocess as sp
 mock_available = False
 try:
     from unittest.mock import patch
+    from unittest.mock import call
     mock_available = True
 except ImportError:
-    patch = None
+    pass
 
 
 class TestSimpleExecution(unittest.TestCase):
@@ -36,14 +37,23 @@ class TestSimpleExecution(unittest.TestCase):
         prepare_environment("-c testdata/real_simple_config.yaml".split())
         config = get_and_init_configuration()
         tsgs = get_test_set_groups(config)
-        with patch("intmaniac.testrun.sp.run") as mock:
-            mock.return_value = sp.CompletedProcess(args=[], returncode=0, stdout="hi")
+        with patch("intmaniac.testrun.run_command") as mock:
+            mock.side_effect = [
+                sp.CompletedProcess(args=[], returncode=0, stdout="hi"),
+                sp.CompletedProcess(args=[], returncode=0, stdout=None),
+                sp.CompletedProcess(args=[], returncode=0, stdout=None),
+            ]
+            expected_calls = [
+                call(self.base_cmdline+"echo hi".split()),
+                call("docker-compose kill".split(" ")),
+                call("docker-compose rm".split(" ")),
+            ]
             result = tsgs[0][0].run()
-            mock.assert_called_with(self.base_cmdline+"echo hi".split(),
-                                    check=True,
-                                    stdout=sp.PIPE, stderr=sp.STDOUT,
-                                    universal_newlines=True)
-        tsgs[0][0].dump()
+            # if you step through here with the IDE the results will be
+            # fucked. cause the IDE interferes with the mock.
+            # just so you remember.
+            self.assertEqual(3, len(mock.mock_calls))
+            self.assertEqual(expected_calls, mock.mock_calls)
         for test in tsgs[0][0].tests:
             self.assertIsNone(test.exception)
         self.assertTrue(result)
