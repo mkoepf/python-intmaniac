@@ -11,15 +11,15 @@ class OutputException(Exception):
 
 
 class GenericOutput:
-    str_test_suite_open = "##### STARTING TEST SUITE: {name} #####"
-    str_test_suite_done = "##### FINISHED TEST SUITE: {name} #####"
-    str_test_open = "----- STARTING TEST {name} -----"
+    str_test_suite_open = "### TEST SUITE: {name}"
+    str_test_suite_done = "### /TEST SUITE: {name}"
+    str_test_open = "## TEST: {name}"
     str_test_fail = "TEST FAILURE:\nTYPE: {type}\nMESSAGE: {message}\nDETAILS:\n{details}\n"
     str_test_stdout = "TEST STDOUT:\n{text}"
     str_test_stderr = "TEST STDERR:\n{text}"
-    str_test_done = "----- FINISHED TEST {name} -----"
-    str_block_open = "########## {name} ##########"
-    str_block_done = "########## END {name} ##########"
+    str_test_done = "## /TEST {name}"
+    str_block_open = "**** BLOCK {name}"
+    str_block_done = "**** /BLOCK {name}"
 
     def __init__(self):
         self.open_tests = []
