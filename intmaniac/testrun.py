@@ -130,7 +130,7 @@ class Testrun(threading.Thread):
 
     def cleanup(self):
         cleanup = True
-        for cmd in ("docker-compose kill", "docker-compose rm"):
+        for cmd in ("docker-compose kill", "docker-compose rm -f"):
             try:
                 self.log.debug("cleanup command: %s" % cmd)
                 rv = run_command(cmd.split(" "))

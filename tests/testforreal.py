@@ -47,7 +47,7 @@ class TestSimpleExecution(unittest.TestCase):
             expected_calls = [
                 call(self.base_cmdline+"echo hi".split()),
                 call("docker-compose kill".split(" ")),
-                call("docker-compose rm".split(" ")),
+                call("docker-compose rm -f".split(" ")),
             ]
             result = tsgs[0][0].run()
             # if you step through here with the IDE the results will be
