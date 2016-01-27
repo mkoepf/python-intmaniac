@@ -181,7 +181,7 @@ class Testrun(threading.Thread):
             self.results.append(e)
             self.success = False
             self.reason = "Failed command"
-        self.log.warn("test successful" if self.success else "test FAILED")
+        self.log.warning("test successful" if self.success else "test FAILED")
         return self.success
 
     def succeeded(self):

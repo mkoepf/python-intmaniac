@@ -47,7 +47,7 @@ class Testset(Thread):
             else:
                 self.failed_tests.append(test)
                 self.success = False
-        self.log.warn("testset successful" if self.success else "testset FAILED")
+        self.log.warning("testset successful" if self.success else "testset FAILED")
         return self.success
 
     def dump(self):
