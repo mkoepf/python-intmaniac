@@ -1,4 +1,4 @@
-# Juggler
+# INTManiac
 
 This python script defines a "matrix test runner", which is basically a fancy way of saying ...
 
@@ -15,7 +15,7 @@ For an example of a possible configuration see below.
 
 For most products you want to test them embedded in a system of connected components. For example if you use a database, it might be good to know with which versions of the database your product works, or that your latest build has still the same API functionality than your stable branch.
 
-`intmaniac` enables you to write a parameterized `docker-compose`` template which describes your full test environment, and then run tests against it.
+`intmaniac` enables you to write a parameterized `docker-compose` template which describes your full test environment, and then run tests against it.
 
 It is assumed that one container in your composition contains a test tool of the system, which is then executed with one or more commands. For this the testing container (the default name is `test-service`) is executed by intmania with a set of user-defined commands. `docker-compose` should bring up all dependent services on the first execution of the `docker-compose run` command.
 
