@@ -12,15 +12,15 @@ class OutputException(Exception):
 
 class GenericOutput:
     str_message = "{message} (status: {status}, details: {details})"
-    str_test_suite_open = "### TEST SUITE: {name}"
-    str_test_suite_done = "### /TEST SUITE: {name}"
+    str_test_suite_open = "\n### TEST SUITE: {name}\n"
+    str_test_suite_done = "\n### /TEST SUITE: {name}\n"
     str_test_open = "## TEST: {name}"
     str_test_fail = "TEST FAILURE:\nTYPE: {type}\nMESSAGE: {message}\nDETAILS:\n{details}\n"
     str_test_stdout = "TEST STDOUT:\n{text}"
     str_test_stderr = "TEST STDERR:\n{text}"
-    str_test_done = "## /TEST {name}"
-    str_block_open = "**** BLOCK {name}"
-    str_block_done = "**** /BLOCK {name}"
+    str_test_done = "## /TEST {name}\n"
+    str_block_open = "\n**** BLOCK {name}"
+    str_block_done = "**** /BLOCK {name}\n"
 
     def __init__(self):
         self.open_tests = []
@@ -62,13 +62,13 @@ class GenericOutput:
         self.dump(self.str_test_stdout.format(text=s.strip()))
 
     def test_stderr(self, s):
-        self.dump(self.str_test_stderr.format(text=s))
+        self.dump(self.str_test_stderr.format(text=s.strip()))
 
     def test_failed(self, type="GenericFailure", message="No reason available", details="No details available"):
         self.dump(self.str_test_fail.format(name=self.open_tests[-1],
                                             type=type,
-                                            message=message,
-                                            details=details))
+                                            message=message.strip(),
+                                            details=details.strip()))
 
     def test_done(self):
         self.dump(self.str_test_done.format(name=self.open_tests.pop()))
