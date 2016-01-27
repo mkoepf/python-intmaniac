@@ -11,8 +11,9 @@ import logging as log
 from errno import *
 from argparse import ArgumentParser
 
-loglevels = [10000, log.ERROR, log.WARNING, log.INFO, log.DEBUG]
+loglevels = [log.CRITICAL*2, log.CRITICAL, log.ERROR, log.WARNING, log.INFO, log.DEBUG]
 config = None
+logger = lambda: None
 
 
 def fail(errormessage):
@@ -74,7 +75,7 @@ def get_and_init_configuration():
                 fail("Could not find configuration file: %s" % config.config_file)
             else:
                 fail("Unspecified IO error: %s" % str(e))
-        log.info("Read configuration file %s" % config.config_file)
+        logger.info("Read configuration file %s" % config.config_file)
         return tools.deep_merge(stub, filedata)
 
     def prepare_global_config(setupdata):
@@ -104,7 +105,7 @@ def run_test_set_groups(tsgs):
         if not retval:
             # just for nicer output
             for tso in testsetgroup:
-                log.warning("skipping %s because of failed dependency" % tso)
+                logger.warning("skipping %s because of failed dependency" % tso)
             continue
         # everything in here is run in parallel
         for testsetobj in testsetgroup:
@@ -114,7 +115,7 @@ def run_test_set_groups(tsgs):
             retval = testsetobj.succeeded() and retval
             dumps.append(testsetobj.dump)
             if not testsetobj.succeeded():
-                log.critical("%s failed, skipping following testsets"
+                logger.critical("%s failed, skipping following testsets"
                              % testsetobj)
     print("TEST PROTOCOL")
     for dump_function in dumps:
@@ -123,7 +124,7 @@ def run_test_set_groups(tsgs):
 
 
 def prepare_environment(arguments):
-    global config
+    global config, logger
     parser = ArgumentParser()
     parser.add_argument("-c", "--config-file",
                         help="specify configuration file",
@@ -136,8 +137,8 @@ def prepare_environment(arguments):
                         default=0,
                         action="count")
     config = parser.parse_args(arguments)
-    llevel = loglevels[min(len(loglevels)-1, config.verbose)]
-    log.basicConfig(level=llevel)
+    log.basicConfig(level=loglevels[min(len(loglevels)-1, config.verbose)])
+    logger = log.getLogger(__name__)
 
 
 def console_entrypoint():
