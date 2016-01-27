@@ -37,11 +37,11 @@ class Testset(Thread):
 
     def run(self):
         for test in self.tests:
-            log.debug("starting test <%s>" % test.name)
+            self.log.debug("starting test <%s>" % test.name)
             test.start()
         for test in self.tests:
             test.join()
-            log.debug("joined test <%s>" % test.name)
+            self.log.debug("joined test <%s>" % test.name)
             if test.succeeded():
                 self.succeeded_tests.append(test)
             else:
