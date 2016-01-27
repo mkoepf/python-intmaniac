@@ -16,7 +16,7 @@ config = None
 
 
 def fail(errormessage):
-    log.critical("%s" % errormessage)
+    print("FATAL: %s" % errormessage)
     sys.exit(-10)
 
 
