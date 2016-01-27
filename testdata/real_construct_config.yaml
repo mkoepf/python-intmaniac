@@ -1,0 +1,30 @@
+---
+
+version: 1.0
+
+global:
+  meta:
+    # this is always relative to the config file, which is here.
+    docker_compose_template: real_construct_compose.yml
+    test_basedir: ../ignoreme
+
+testsets:
+
+  - basic:
+
+      webpage_available:
+        meta:
+          allow_failure: true
+          test_commands:
+            # the service starts after 5 seconds, THIS WILL FAIL
+            - wget tested:8000 -O -
+
+
+  - extended_tests:
+
+      webpage_available:
+        meta:
+          test_commands:
+            # WE NEED TO SLEEP, in the docker-compose there's a sleep too!!
+            - sleep 10
+            - wget tested:8000 -O -

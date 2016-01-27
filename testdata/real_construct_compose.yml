@@ -1,0 +1,10 @@
+---
+
+tested-service:
+ image: python:3
+ command: bash -c "sleep 5 ; python -m http.server"
+
+test-service:
+  image: busybox
+  links:
+    - tested-service:tested
