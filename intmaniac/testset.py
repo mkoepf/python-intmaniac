@@ -15,7 +15,7 @@ class Testset(Thread):
 
     def __init__(self, global_config={}, *args, **kwargs):
         super(Testset, self).__init__(*args, **kwargs)
-        self.log = log.getLogger(self.name)
+        self.log = log.getLogger("ts-%s" % self.name)
         self.log.debug("Instantiated")
         self.tests = []
         self.name = kwargs['name'] if kwargs.get('name') else "default"

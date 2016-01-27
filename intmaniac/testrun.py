@@ -41,7 +41,7 @@ class Testrun(threading.Thread):
 
     def __init__(self, test_definition, *args, **kwargs):
         super(Testrun, self).__init__(*args, **kwargs)
-        self.log = log.getLogger(self.name)
+        self.log = log.getLogger("t-%s" % self.name)
         self.log.debug("Instantiated")
         test_definition = deep_merge(default_config, test_definition)
         # quick shortcuts
