@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 
+import os.path
 import subprocess as sp
 from sys import version_info as vinf
 
 python_version = 10 * vinf[0] + vinf[1]
+debug = False
+
 
 
 class DummyCompletedProcess:
@@ -39,6 +42,9 @@ def run_command(command):
     failure. The object WILL HAVE the python 3 .stdout and .stderr
     properties, always.
     :param command an array to execute as one command
+    :returns a (Dummy)CompletedProcess or CalledProcessError instance, making
+     sure all of them have the .stdout, .stderr, .args and .returncode
+     properties.
     """
     try:
         if python_version >= 35:
@@ -76,6 +82,24 @@ def run_command(command):
         rv.stderr = None
         raise rv
     return rv
+
+
+def construct_test_dir(basedir, testname):
+    """If the docker cleanup fails, then we will not have the same names in
+    the next run (in which case docker-compose fails). That's why we do prefix
+    the test directories with the PID.
+    :param basedir the base directory in which the test dirs should be created
+    :param testname the name of the test, already sanitized
+    :returns a string containing the final path for the docker-compose.yml
+    template."""
+    prefix = '' if debug else 'p'+str(os.getpid())
+    testdir = os.path.join(basedir, prefix + testname)
+    return testdir
+
+
+def enable_debug():
+    global debug
+    debug = True
 
 
 if __name__ == "__main__":

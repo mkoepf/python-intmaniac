@@ -3,6 +3,7 @@
 from intmaniac import prepare_environment, get_test_set_groups
 from intmaniac import get_and_init_configuration
 from intmaniac.testrun import Testrun
+from intmaniac.tools import enable_debug
 
 import unittest
 import os
@@ -23,6 +24,7 @@ except ImportError:
 class TestSimpleExecution(unittest.TestCase):
 
     def setUp(self):
+        enable_debug()
         self.save_dir = os.getcwd()
         base_dir = os.path.realpath("ignoreme/real-test1")
         self.base_cmdline = [

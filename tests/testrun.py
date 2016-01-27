@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
 from intmaniac.testrun import Testrun
+from intmaniac import tools
 
 import unittest
-from os import getcwd
+from os import getcwd, getpid
 
 
 configs = [
@@ -41,6 +42,9 @@ configs = [
 
 
 class TTestrun(unittest.TestCase):
+
+    def setUp(self):
+        tools.enable_debug()
 
     def test_object_creation_works(self):
         """Check if no errors appear on calling the constructor"""

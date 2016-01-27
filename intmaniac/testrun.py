@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from intmaniac.tools import deep_merge, run_command
+from intmaniac.tools import deep_merge, run_command, construct_test_dir
 from intmaniac.output import output
 
 import copy
@@ -70,7 +70,7 @@ class Testrun(threading.Thread):
         self.base_dir = tmp
         # self.SANITIZED_NAME, .TEST_DIR
         self.sanitized_name = resub("[^a-zA-Z0-9_]", "-", self.name)
-        self.test_dir = join(self.base_dir, self.sanitized_name)
+        self.test_dir = construct_test_dir(self.base_dir, self.sanitized_name)
         # extend SELF.TEST_ENV with TEST_DIR
         self.test_env['test_dir'] = self.test_dir
         #### create SELF.COMMANDLINE
