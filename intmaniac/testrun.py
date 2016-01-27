@@ -39,6 +39,11 @@ class Testrun(threading.Thread):
     configuration, and evaluates the results.
     """
 
+    NOTRUN = "NOTRUN"
+    SUCCEEDED = "SUCCEEDED"
+    CONTROLLED_FAILURE = "ALLOWED_FAILURE"
+    FAILURE = "FAILED"
+
     def __init__(self, test_definition, *args, **kwargs):
         super(Testrun, self).__init__(*args, **kwargs)
         self.log = log.getLogger("t-%s" % self.name)
@@ -81,8 +86,8 @@ class Testrun(threading.Thread):
         # sanitize SELF.TEST_META['test_commands']
         if type(self.test_meta['test_commands']) == str:
             self.test_meta['test_commands'] = [self.test_meta['test_commands']]
-        # create SELF.SUCCESS, .RESULT, .EXCEPTION, .REASON
-        self.success = True
+        # create .STATE, .RESULT, .EXCEPTION, .REASON
+        self.state = self.NOTRUN
         self.results = []
         self.exception = None
         self.reason = None
@@ -141,6 +146,7 @@ class Testrun(threading.Thread):
             self.log.error("cleanup failed")
 
     def run(self):
+        success = True
         try:
             self.init_environment()
             if len(self.test_meta['test_commands']) > 0:
@@ -152,7 +158,7 @@ class Testrun(threading.Thread):
                 self.run_test_command()
         except IOError as e:
             self.exception = e
-            self.success = False
+            success = False
             self.reason = "Exception"
             # for now we re-raise to get the stacktrace on the console.
             raise e
@@ -162,19 +168,24 @@ class Testrun(threading.Thread):
             self.log.info("command FAILED.")
             self.log.debug("command output: %s" % e.stdout.strip())
             self.results.append(e)
-            self.success = False
+            success = False
             self.reason = "Failed command"
         finally:
             self.cleanup()
-        self.log.warning("test successful" if self.success else "test FAILED")
-        return self.success
+        # evaluate test results
+        if self.test_meta.get('allow_failure', False) and not success:
+            self.state = self.CONTROLLED_FAILURE
+        else:
+            self.state = self.SUCCEEDED if success else self.FAILURE
+        self.log.warning("test state %s" % self.state)
+        return self.succeeded()
 
     def succeeded(self):
-        return self.success
+        return self.state in (self.SUCCEEDED, self.CONTROLLED_FAILURE)
 
     def dump(self):
         output.test_open(self.name)
-        if not self.success:
+        if not self.succeeded():
             output.test_failed(type=self.reason,
                                message=str(self.exception)
                                if self.exception

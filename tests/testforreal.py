@@ -2,6 +2,7 @@
 
 from intmaniac import prepare_environment, get_test_set_groups
 from intmaniac import get_and_init_configuration
+from intmaniac.testrun import Testrun
 
 import unittest
 import os
@@ -57,3 +58,22 @@ class TestSimpleExecution(unittest.TestCase):
         for test in tsgs[0][0].tests:
             self.assertIsNone(test.exception)
         self.assertTrue(result)
+
+    @unittest.skipUnless(mock_available,
+                         "No mocking available in this Python version")
+    def test_for_allowed_failure(self):
+        prepare_environment("-c testdata/real_simple_config.yaml".split())
+        config = get_and_init_configuration()
+        tsgs = get_test_set_groups(config)
+        tst = tsgs[0][0].tests[0]
+        # we inject the allow_failure attribute here.
+        tst.test_meta['allow_failure'] = True
+        with patch("intmaniac.testrun.run_command") as mock:
+            mock.side_effect = [
+                sp.CalledProcessError(1, 'oioi', 'error simulation'),
+                sp.CompletedProcess(args=[], returncode=0, stdout=None),
+                sp.CompletedProcess(args=[], returncode=0, stdout=None),
+            ]
+            result = tst.run()
+        self.assertTrue(result)
+        self.assertEqual(Testrun.CONTROLLED_FAILURE, tst.state)
