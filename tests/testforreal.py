@@ -3,22 +3,29 @@
 from intmaniac import prepare_environment, get_test_set_groups
 from intmaniac import get_and_init_configuration
 from intmaniac.testrun import Testrun
-from intmaniac.tools import enable_debug
+from intmaniac.tools import enable_debug, _construct_return_object
 
+from sys import version_info as vinf
 import unittest
 import os
-import subprocess as sp
 
 # this is python3 testing only.
 # so let's make sure this is not executed on python2
 # that sucks *so* much.
 mock_available = False
 try:
+    # python 3.something
     from unittest.mock import patch
     from unittest.mock import call
     mock_available = True
 except ImportError:
-    pass
+    try:
+        # python < 3.something with mock installed
+        from mock import patch, call
+        mock_available = True
+    except ImportError:
+        pass
+# did I mention this sucks?
 
 
 class TestSimpleExecution(unittest.TestCase):
@@ -37,7 +44,7 @@ class TestSimpleExecution(unittest.TestCase):
 
     @unittest.skipUnless(mock_available, "No mocking available in this Python version")
     def test_single_container_setup(self):
-        prepare_environment("-c testdata/real_simple_config.yaml".split())
+        prepare_environment("-c testdata/real_simple_config.yaml -vvvvv".split())
         config = get_and_init_configuration()
         tsgs = get_test_set_groups(config)
         with patch("intmaniac.testrun.run_command") as mock:
@@ -65,7 +72,7 @@ class TestSimpleExecution(unittest.TestCase):
     @unittest.skipUnless(mock_available,
                          "No mocking available in this Python version")
     def test_for_allowed_failure(self):
-        prepare_environment("-c testdata/real_simple_config.yaml".split())
+        prepare_environment("-c testdata/real_simple_config.yaml -vvvvv".split())
         config = get_and_init_configuration()
         tsgs = get_test_set_groups(config)
         tst = tsgs[0][0].tests[0]
