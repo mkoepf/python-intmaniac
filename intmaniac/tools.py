@@ -2,11 +2,22 @@
 
 import os.path
 import subprocess as sp
+import logging as log
 from sys import version_info as vinf
 
 python_version = 10 * vinf[0] + vinf[1]
 debug = False
 
+
+class Toolslogger:
+
+    logger = None
+
+    @staticmethod
+    def get():
+        if not Toolslogger.logger:
+            Toolslogger.logger = log.getLogger(__name__)
+        return Toolslogger.logger
 
 
 class DummyCompletedProcess:
@@ -65,6 +76,7 @@ def run_command(command):
     try:
         if python_version >= 35:
             # python 3.5 implementation, which rules
+            Toolslogger.get().debug("Python == 35 run_command used")
             rv = sp.run(
                 command,
                 check=True,
@@ -73,6 +85,7 @@ def run_command(command):
             )
             rv.cmd = rv.args
         else:
+            Toolslogger.get().debug("Python < 35 run_command used")
             # the others, which kinda suck.
             p = sp.Popen(command, stdout=sp.PIPE, stderr=sp.STDOUT)
             stdout, _ = p.communicate()
