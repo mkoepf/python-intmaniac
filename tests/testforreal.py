@@ -42,9 +42,10 @@ class TestSimpleExecution(unittest.TestCase):
         tsgs = get_test_set_groups(config)
         with patch("intmaniac.testrun.run_command") as mock:
             mock.side_effect = [
-                sp.CompletedProcess(args=[], returncode=0, stdout="hi"),
-                sp.CompletedProcess(args=[], returncode=0, stdout=None),
-                sp.CompletedProcess(args=[], returncode=0, stdout=None),
+                # args, returncode, stdout is the constructor.
+                _construct_return_object(0, [], "hi"),
+                _construct_return_object(0, [], None),
+                _construct_return_object(0, [], None),
             ]
             expected_calls = [
                 call(self.base_cmdline+"echo hi".split()),
@@ -72,9 +73,9 @@ class TestSimpleExecution(unittest.TestCase):
         tst.test_meta['allow_failure'] = True
         with patch("intmaniac.testrun.run_command") as mock:
             mock.side_effect = [
-                sp.CalledProcessError(1, 'oioi', 'error simulation'),
-                sp.CompletedProcess(args=[], returncode=0, stdout=None),
-                sp.CompletedProcess(args=[], returncode=0, stdout=None),
+                _construct_return_object(1, ['oioi'], "error simulation"),
+                _construct_return_object(0, [], None),
+                _construct_return_object(0, [], None),
             ]
             result = tst.run()
         self.assertTrue(result)

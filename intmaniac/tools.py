@@ -12,11 +12,14 @@ debug = False
 class DummyCompletedProcess:
     """Poor man's Pyton 2.7 CompletedProcess replacement"""
 
-    def __init__(self, returncode, cmd, output=None):
+    # same signature as original class
+    def __init__(self, args, returncode, stdout=None, stderr=None):
         # mimic constructor and behavior of CalledProcessError
-        self.cmd = cmd
+        self.args = args
         self.returncode = returncode
-        self.output = output
+        self.output = stdout
+        self.stdout = stdout
+        self.stderr = stderr
 
     def __str__(self):
         return "<DummyCompletedProcess: %s (%d)" % \
@@ -34,6 +37,19 @@ def deep_merge(d0, d1):
         if k not in d1:
             d[k] = v
     return d
+
+
+def _construct_return_object(returncode, args, stdout, stderr=None):
+    if returncode == 0:
+        cls = sp.CompletedProcess \
+            if python_version >= 35 \
+            else DummyCompletedProcess
+        rv = cls(args, returncode, stdout, stderr)
+    else:
+        rv = sp.CalledProcessError(returncode, args, stdout)
+        if not hasattr(rv, "stdout"):
+            rv.stdout = rv.output
+    return rv
 
 
 def run_command(command):
@@ -61,15 +77,7 @@ def run_command(command):
             p = sp.Popen(command, stdout=sp.PIPE, stderr=sp.STDOUT)
             stdout, _ = p.communicate()
             # mimic check=True behavior from python3
-            cls = DummyCompletedProcess \
-                if p.returncode == 0 \
-                else sp.CalledProcessError
-            rv = cls(p.returncode, command, stdout)
-            # deviate from python standard. make all have .args
-            # and make all have .stdout and .stderr like python 3.5
-            rv.args = rv.cmd
-            rv.stdout = rv.output
-            rv.stderr = None
+            rv = _construct_return_object(p.returncode, command, stdout)
             if type(rv) == sp.CalledProcessError:
                 raise rv
     except OSError as err:
