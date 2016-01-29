@@ -110,7 +110,7 @@ class DummyCompletedProcess:
 
     def __str__(self):
         return "<DummyCompletedProcess: %s (%d)" % \
-               (" ".join(self.cmd), self.returncode)
+               (" ".join(self.args), self.returncode)
 
 
 def _construct_return_object(returncode, args, stdout, stderr=None):
