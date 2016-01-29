@@ -5,8 +5,6 @@ from intmaniac import get_and_init_configuration
 from intmaniac.tools import enable_debug
 
 import unittest
-import os
-import os.path
 
 
 class TestTemplateEmpty(unittest.TestCase):
