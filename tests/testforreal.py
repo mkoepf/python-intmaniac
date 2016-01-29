@@ -5,7 +5,6 @@ from intmaniac import get_and_init_configuration
 from intmaniac.testrun import Testrun
 from intmaniac.tools import enable_debug, _construct_return_object
 
-from sys import version_info as vinf
 import unittest
 import os
 

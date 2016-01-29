@@ -4,7 +4,7 @@ from intmaniac.testrun import Testrun
 from intmaniac import tools
 
 import unittest
-from os import getcwd, getpid
+from os import getcwd
 
 
 configs = [
