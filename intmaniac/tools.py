@@ -130,7 +130,7 @@ def _construct_return_object(returncode, args, stdout, stderr=None):
     return rv
 
 
-def run_command(command):
+def run_command(command, *args, **kwargs):
     """takes an array as "command", which is executed. Mimics python 3
     behavior, in the way that it returns a CalledProcessError on execution
     failure. The object WILL HAVE the python 3 .stdout and .stderr
@@ -141,25 +141,12 @@ def run_command(command):
      properties.
     """
     try:
-        if python_version >= 35:
-            # python 3.5 implementation, which rules
-            Toolslogger.get().debug("Python == 35 run_command used")
-            rv = sp.run(
-                command,
-                check=True,
-                stdout=sp.PIPE, stderr=sp.STDOUT,
-                universal_newlines=True,
-            )
-            rv.cmd = rv.args
-        else:
-            Toolslogger.get().debug("Python < 35 run_command used")
-            # the others, which kinda suck.
-            p = sp.Popen(command, stdout=sp.PIPE, stderr=sp.STDOUT)
-            stdout, _ = p.communicate()
-            # mimic check=True behavior from python3
-            rv = _construct_return_object(p.returncode, command, stdout)
-            if type(rv) == sp.CalledProcessError:
-                raise rv
+        p = sp.Popen(command, *args, stdout=sp.PIPE, stderr=sp.STDOUT, **kwargs)
+        stdout, _ = p.communicate()
+        # we want an exception on failed commands, yes?
+        rv = _construct_return_object(p.returncode, command, stdout)
+        if type(rv) == sp.CalledProcessError:
+            raise rv
     except OSError as err:
         # python 2 & 3, make this behave consistently
         # has .returncode, command and output properties and constructor
