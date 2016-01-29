@@ -2,6 +2,7 @@
 
 from intmaniac import prepare_environment, get_test_set_groups
 from intmaniac import get_and_init_configuration
+from intmaniac.tools import enable_debug
 
 import unittest
 import os
@@ -11,6 +12,7 @@ import os.path
 class TestTemplateEmpty(unittest.TestCase):
 
     def setUp(self):
+        enable_debug()
         prepare_environment("-c testdata/testconfig_empty.yaml".split())
         config = get_and_init_configuration()
         self.tsgs = get_test_set_groups(config)
@@ -26,6 +28,7 @@ class TestTemplateEmpty(unittest.TestCase):
 class TestTemplateArrayTriple(unittest.TestCase):
 
     def setUp(self):
+        enable_debug()
         prepare_environment("-c testdata/testconfig_array_triple.yaml".split())
         config = get_and_init_configuration()
         self.tsgs = get_test_set_groups(config)
@@ -65,6 +68,7 @@ class TestTemplateArrayTriple(unittest.TestCase):
 class TestTemplateKeysTriple(unittest.TestCase):
 
     def setUp(self):
+        enable_debug()
         prepare_environment("-c testdata/testconfig_keys_triple.yaml".split())
         config = get_and_init_configuration()
         self.tsgs = get_test_set_groups(config)
@@ -100,6 +104,7 @@ class TestTemplateKeysTriple(unittest.TestCase):
 class TestTemplateSubglobals(unittest.TestCase):
 
     def setUp(self):
+        enable_debug()
         self.test_data = "testdata/testconfig_sub_globals.yaml"
         prepare_environment(["-c", self.test_data])
         config = get_and_init_configuration()

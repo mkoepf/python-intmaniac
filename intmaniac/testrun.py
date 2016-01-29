@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
 from intmaniac.tools import deep_merge, run_command, construct_test_dir
+from intmaniac.tools import get_logger
 from intmaniac.output import output
 
 import copy
 import threading
 import shutil
-import logging as log
 import subprocess as sp
 import os
 from os.path import basename, join, isabs, realpath, dirname
@@ -46,8 +46,6 @@ class Testrun(threading.Thread):
 
     def __init__(self, test_definition, *args, **kwargs):
         super(Testrun, self).__init__(*args, **kwargs)
-        self.log = log.getLogger("t-%s" % self.name)
-        self.log.debug("Instantiated")
         test_definition = deep_merge(default_config, test_definition)
         # quick shortcuts
         self.test_env = test_definition['environment']
@@ -91,6 +89,10 @@ class Testrun(threading.Thread):
         self.results = []
         self.exception = None
         self.reason = None
+        # log setup
+        # NO LOGGING BEFORE HERE
+        self.log = get_logger("t-%s" % self.name,
+                              filename=join(self.test_dir, "log.txt"))
         # some debug output
         self.log.info("base commandline '%s'" % " ".join(self.commandline))
         self.log.debug("test directory '%s'" % self.test_dir)

@@ -1,11 +1,15 @@
 #!/usr/bin/env python
 
 from intmaniac.testset import Testset
+from intmaniac.tools import enable_debug
 
 import unittest
 
 
 class TTestset(unittest.TestCase):
+
+    def setUp(self):
+        enable_debug()
 
     def test_global_environment_propagation(self):
         t = Testset()

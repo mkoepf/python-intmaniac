@@ -43,8 +43,8 @@ def get_logger(name, level=-1, filename=None):
     logger.addHandler(shandler)
     # if filename is given, add a stream handler which handles ALL log messages
     # and writes them into a file
-    if filename:
-        fhandler = log.FileHandler(filename)
+    if filename and not debug:
+        fhandler = log.FileHandler(filename, mode="w")
         fhandler.setLevel(0)
         logger.addHandler(fhandler)
     return logger
