@@ -91,8 +91,8 @@ class Testrun(threading.Thread):
         self.reason = None
         # log setup
         # NO LOGGING BEFORE HERE
-        self.log = get_logger("t-%s" % self.name,
-                              filename=join(self.test_dir, "log.txt"))
+        log_filename = join(self.base_dir, basename(self.test_dir)) + ".log"
+        self.log = get_logger("t-%s" % self.name, filename=log_filename)
         # some debug output
         self.log.info("base commandline '%s'" % " ".join(self.commandline))
         self.log.debug("test directory '%s'" % self.test_dir)

@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from intmaniac.defaults import *
+
 import os.path
 import subprocess as sp
 import logging as log
@@ -26,7 +28,7 @@ def init_logging(config):
     global_log_level = loglevels[min(len(loglevels)-1, config.verbose)]
     log.basicConfig(
         level=global_log_level,
-        format="\n%(asctime)s %(levelname)-8s %(name)-12s\n%(message)s",
+        format=LOG_FORMAT_CONSOLE,
     )
 
 
@@ -38,15 +40,17 @@ def get_logger(name, level=-1, filename=None):
     # add a stream handler for console logging in any case.
     # that will be configured with global log level or the log level from the
     # parameter
-    shandler = log.StreamHandler()
-    shandler.setLevel(level if level > -1 else global_log_level)
-    logger.addHandler(shandler)
+    handler = log.StreamHandler()
+    handler.setLevel(level if level > -1 else global_log_level)
+    logger.addHandler(handler)
     # if filename is given, add a stream handler which handles ALL log messages
     # and writes them into a file
     if filename and not debug:
-        fhandler = log.FileHandler(filename, mode="w")
-        fhandler.setLevel(0)
-        logger.addHandler(fhandler)
+        formatter = log.Formatter(fmt=LOG_FORMAT_FILEOUT)
+        handler = log.FileHandler(filename=filename, mode="w")
+        handler.setFormatter(formatter)
+        handler.setLevel(0)
+        logger.addHandler(handler)
     return logger
 
 
