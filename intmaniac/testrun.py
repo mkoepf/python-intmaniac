@@ -110,7 +110,6 @@ class Testrun(threading.Thread):
         self.log.debug("creating test directory %s" % self.test_dir)
         shutil.rmtree(self.test_dir, ignore_errors=True)
         os.makedirs(self.test_dir)
-        os.chdir(self.test_dir)
         # TODO - catch & error handling if template cannot be found.
         with open(self.template, "r") as ifile:
             tpl = ifile.read()
@@ -127,7 +126,7 @@ class Testrun(threading.Thread):
             command = self.commandline
         else:
             command = self.commandline + command
-        rv = run_command(command)
+        rv = run_command(command, cwd=self.test_dir)
         self.results.append(rv)
 
     def cleanup(self):
