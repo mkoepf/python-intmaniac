@@ -9,6 +9,40 @@ python_version = 10 * vinf[0] + vinf[1]
 debug = False
 
 
+loglevels = [log.CRITICAL*2, log.CRITICAL, log.ERROR, log.WARNING, log.INFO, log.DEBUG]
+global_log_level = -1
+
+
+def init_logging(config):
+    """:param config the configuration object from argparse"""
+    global global_log_level
+    global_log_level = loglevels[min(len(loglevels)-1, config.verbose)]
+    log.basicConfig(
+        level=global_log_level,
+        format="\n%(asctime)s %(levelname)-8s %(name)-12s\n%(message)s",
+    )
+
+
+def get_logger(name, level=-1, filename=None):
+    # create new logger
+    logger = log.getLogger(name)
+    # process all messages
+    logger.setLevel(-1)
+    # add a stream handler for console logging in any case.
+    # that will be configured with global log level or the log level from the
+    # parameter
+    shandler = log.StreamHandler()
+    shandler.setLevel(level if level > -1 else global_log_level)
+    logger.addHandler(shandler)
+    # if filename is given, add a stream handler which handles ALL log messages
+    # and writes them into a file
+    if filename:
+        fhandler = log.FileHandler(filename)
+        fhandler.setLevel(0)
+        logger.addHandler(fhandler)
+    return logger
+
+
 class Toolslogger:
 
     logger = None
@@ -16,7 +50,7 @@ class Toolslogger:
     @staticmethod
     def get():
         if not Toolslogger.logger:
-            Toolslogger.logger = log.getLogger(__name__)
+            Toolslogger.logger = get_logger(__name__)
         return Toolslogger.logger
 
 

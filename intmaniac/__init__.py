@@ -7,13 +7,11 @@ from intmaniac import tools
 from intmaniac.output import init_output
 
 import sys
-import logging as log
 from errno import *
 from argparse import ArgumentParser
 
-loglevels = [log.CRITICAL*2, log.CRITICAL, log.ERROR, log.WARNING, log.INFO, log.DEBUG]
 config = None
-logger = lambda: None
+logger = None
 
 
 def fail(errormessage):
@@ -137,8 +135,8 @@ def prepare_environment(arguments):
                         default=0,
                         action="count")
     config = parser.parse_args(arguments)
-    log.basicConfig(level=loglevels[min(len(loglevels)-1, config.verbose)])
-    logger = log.getLogger(__name__)
+    tools.init_logging(config)
+    logger = tools.get_logger(__name__)
 
 
 def console_entrypoint():
