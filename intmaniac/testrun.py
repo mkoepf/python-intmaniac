@@ -194,7 +194,7 @@ class Testrun(threading.Thread):
                                if self.exception
                                else "Test output following",
                                details="No details available")
-        output.test_stdout("\n".join([r.stdout for r in self.results]))
+        output.test_stdout("\n".join([r.stdout.decode('utf-8') for r in self.results]))
         output.test_done()
 
 if __name__ == "__main__":
