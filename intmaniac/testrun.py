@@ -73,7 +73,7 @@ class Testrun(threading.Thread):
         self.test_dir = construct_test_dir(self.base_dir, self.sanitized_name)
         # extend SELF.TEST_ENV with TEST_DIR
         self.test_env['test_dir'] = self.test_dir
-        #### create SELF.COMMANDLINE
+        # create SELF.COMMANDLINE
         self.commandline = copy.copy(default_commandline_start)
         for param in self.test_meta['docker_compose_params']:
             self.commandline.append(param)

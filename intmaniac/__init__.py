@@ -19,12 +19,27 @@ def fail(errormessage):
     sys.exit(-10)
 
 
+##############################################################################
+#                                                                            #
+# default configuration values for test config                               #
+#                                                                            #
+##############################################################################
+
+
 def get_test_config_stub():
     return {'config': {}, 'meta': {}, 'environment': {}}
 
 
 def get_full_config_stub():
     return {'global': get_test_config_stub(), 'testsets': {}, 'output_format': 'text'}
+
+
+##############################################################################
+#                                                                            #
+# reading of config data                                                     #
+# initialization of test set objects                                         #
+#                                                                            #
+##############################################################################
 
 
 def get_test_set_groups(setupdata):
@@ -96,6 +111,13 @@ def get_and_init_configuration():
     return setupdata
 
 
+##############################################################################
+#                                                                            #
+# run test sets logic                                                        #
+#                                                                            #
+##############################################################################
+
+
 def run_test_set_groups(tsgs):
     retval = True
     dumps = []
@@ -119,6 +141,13 @@ def run_test_set_groups(tsgs):
     for dump_function in dumps:
         dump_function()
     return retval
+
+
+##############################################################################
+#                                                                            #
+# startup initialization                                                     #
+#                                                                            #
+##############################################################################
 
 
 def prepare_environment(arguments):

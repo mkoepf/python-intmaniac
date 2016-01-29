@@ -9,6 +9,13 @@ python_version = 10 * vinf[0] + vinf[1]
 debug = False
 
 
+##############################################################################
+#                                                                            #
+# helper functions for setting up logging                                    #
+#                                                                            #
+##############################################################################
+
+
 loglevels = [log.CRITICAL*2, log.CRITICAL, log.ERROR, log.WARNING, log.INFO, log.DEBUG]
 global_log_level = -1
 
@@ -43,6 +50,13 @@ def get_logger(name, level=-1, filename=None):
     return logger
 
 
+##############################################################################
+#                                                                            #
+# logging helper class just for this module                                  #
+#                                                                            #
+##############################################################################
+
+
 class Toolslogger:
 
     logger = None
@@ -52,6 +66,34 @@ class Toolslogger:
         if not Toolslogger.logger:
             Toolslogger.logger = get_logger(__name__)
         return Toolslogger.logger
+
+
+##############################################################################
+#                                                                            #
+# deep merge two dicts, the rightmost has preference                         #
+#                                                                            #
+##############################################################################
+
+
+def deep_merge(d0, d1):
+    d = {}
+    for k, v in d1.items():
+        if type(v) == dict and k in d0 and type(d0[k]) == dict:
+                d[k] = deep_merge(d0[k], v)
+        else:
+            d[k] = v
+    for k, v in d0.items():
+        if k not in d1:
+            d[k] = v
+    return d
+
+
+##############################################################################
+#                                                                            #
+# python 2, <3.5 and 3.5+ "subprocess.run() / popen.run()" handler           #
+# with unified behavior                                                      #
+#                                                                            #
+##############################################################################
 
 
 class DummyCompletedProcess:
@@ -69,19 +111,6 @@ class DummyCompletedProcess:
     def __str__(self):
         return "<DummyCompletedProcess: %s (%d)" % \
                (" ".join(self.cmd), self.returncode)
-
-
-def deep_merge(d0, d1):
-    d = {}
-    for k, v in d1.items():
-        if type(v) == dict and k in d0 and type(d0[k]) == dict:
-                d[k] = deep_merge(d0[k], v)
-        else:
-            d[k] = v
-    for k, v in d0.items():
-        if k not in d1:
-            d[k] = v
-    return d
 
 
 def _construct_return_object(returncode, args, stdout, stderr=None):
@@ -137,6 +166,14 @@ def run_command(command):
         rv.stderr = None
         raise rv
     return rv
+
+
+##############################################################################
+#                                                                            #
+# debugging helpers - some things (like file creation & access) are unwanted #
+# during debug runs                                                          #
+#                                                                            #
+##############################################################################
 
 
 def construct_test_dir(basedir, testname):
