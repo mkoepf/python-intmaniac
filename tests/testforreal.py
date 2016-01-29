@@ -31,15 +31,11 @@ class TestSimpleExecution(unittest.TestCase):
 
     def setUp(self):
         enable_debug()
-        self.save_dir = os.getcwd()
-        base_dir = os.path.realpath("ignoreme/real-test1")
+        self.test_dir = os.path.realpath("/tmp/ignoreme/real-test1")
         self.base_cmdline = [
             'docker-compose', 'run', '-e',
-            "test_dir=%s" % base_dir,
+            "test_dir=%s" % self.test_dir,
             '--rm', 'test-service']
-
-    def tearDown(self):
-        os.chdir(self.save_dir)
 
     @unittest.skipUnless(mock_available, "No mocking available in this Python version")
     def test_single_container_setup(self):
@@ -54,7 +50,7 @@ class TestSimpleExecution(unittest.TestCase):
                 _construct_return_object(0, [], None),
             ]
             expected_calls = [
-                call(self.base_cmdline+"echo hi".split()),
+                call(self.base_cmdline+"echo hi".split(), cwd=self.test_dir),
                 call("docker-compose kill".split(" ")),
                 call("docker-compose rm -f".split(" ")),
             ]
