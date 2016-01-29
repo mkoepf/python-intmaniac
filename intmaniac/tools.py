@@ -180,7 +180,7 @@ def run_command(command):
 ##############################################################################
 
 
-def construct_test_dir(basedir, testname):
+def dbg_tr_get_testdir(basedir, testname):
     """If the docker cleanup fails, then we will not have the same names in
     the next run (in which case docker-compose fails). That's why we do prefix
     the test directories with the PID.
