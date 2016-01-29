@@ -74,39 +74,40 @@ def get_test_set_groups(setupdata):
     return rv
 
 
+def _get_setupdata():
+    stub = get_full_config_stub()
+    filedata = None
+    try:
+        with open(config.config_file, "r") as ifile:
+            filedata = yaml.safe_load(ifile)
+    except IOError as e:
+        # FileNotFoundError is python3 only. yihah.
+        if e.errno == ENOENT:
+            fail("Could not find configuration file: %s" % config.config_file)
+        else:
+            fail("Unspecified IO error: %s" % str(e))
+    logger.info("Read configuration file %s" % config.config_file)
+    return tools.deep_merge(stub, filedata)
+
+
+def _prepare_global_config(setupdata):
+    global_config = setupdata['global']
+    # add config file location
+    global_config['meta']['_configfile'] = config.config_file
+    # add env settings from command line
+    if config.env:
+        for tmp in config.env:
+            try:
+                k, v = tmp.split("=", 1)
+                global_config['environment'][k] = v
+            except ValueError:
+                fail("Invalid environment setting: %s" % tmp)
+    return global_config
+
+
 def get_and_init_configuration():
-
-    def get_setupdata():
-        stub = get_full_config_stub()
-        filedata = None
-        try:
-            with open(config.config_file, "r") as ifile:
-                filedata = yaml.safe_load(ifile)
-        except IOError as e:
-            # FileNotFoundError is python3 only. yihah.
-            if e.errno == ENOENT:
-                fail("Could not find configuration file: %s" % config.config_file)
-            else:
-                fail("Unspecified IO error: %s" % str(e))
-        logger.info("Read configuration file %s" % config.config_file)
-        return tools.deep_merge(stub, filedata)
-
-    def prepare_global_config(setupdata):
-        global_config = setupdata['global']
-        # add config file location
-        global_config['meta']['_configfile'] = config.config_file
-        # add env settings from command line
-        if config.env:
-            for tmp in config.env:
-                try:
-                    k, v = tmp.split("=", 1)
-                    global_config['environment'][k] = v
-                except ValueError:
-                    fail("Invalid environment setting: %s" % tmp)
-        return global_config
-
-    setupdata = get_setupdata()
-    prepare_global_config(setupdata)
+    setupdata = _get_setupdata()
+    _prepare_global_config(setupdata)
     init_output(setupdata['output_format'])
     return setupdata
 
