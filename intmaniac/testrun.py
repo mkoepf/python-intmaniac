@@ -120,13 +120,18 @@ class Testrun(threading.Thread):
                                "docker-compose.yml"), "w") as ofile:
             ofile.write(tpl)
 
-    def run_test_command(self, command=None, use_base_command=True):
+    def run_command(self, command):
+        """convenience helper so we don't forget to include cwd.
+        :param command the command to be executed."""
+        return run_command(command, cwd=self.test_dir)
+
+    def run_test_command(self, command=None):
         """:param command the command to execute as array"""
         if not command:
             command = self.commandline
         else:
             command = self.commandline + command
-        rv = run_command(command, cwd=self.test_dir)
+        rv = self.run_command(command)
         self.results.append(rv)
 
     def cleanup(self):
@@ -134,7 +139,7 @@ class Testrun(threading.Thread):
         for cmd in ("docker-compose kill", "docker-compose rm -f"):
             try:
                 self.log.debug("cleanup command: %s" % cmd)
-                rv = run_command(cmd.split(" "))
+                rv = self.run_command(cmd.split(" "))
             except sp.CalledProcessError as e:
                 rv = e
                 cleanup = False
