@@ -37,6 +37,7 @@ def get_logger(name, level=-1, filename=None):
     logger = log.getLogger(name)
     # process all messages
     logger.setLevel(-1)
+    logger.propagate = False
     # add a stream handler for console logging in any case.
     # that will be configured with global log level or the log level from the
     # parameter
