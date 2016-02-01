@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+0.5.2
+-----
+
+- fixed bug in cleanup command execution
+- fixed bug in exception logging (yeah)
+- fixed logging output diarrhoe
+
+
 0.5.1
 -----
 
