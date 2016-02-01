@@ -10,6 +10,10 @@ The idea is that you have a program / service / thing, which has to be integrati
 
 For an example of a possible configuration see below.
 
+There is a constantly updated docker container available under:
+
+* `quay.io/flypenguin/intmaniac`
+
 
 ## How this works
 
