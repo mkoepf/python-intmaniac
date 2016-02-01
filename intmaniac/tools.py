@@ -13,6 +13,26 @@ debug = False
 
 ##############################################################################
 #                                                                            #
+# generic helpers                                                            #
+#                                                                            #
+##############################################################################
+
+
+def fail(errormessage):
+    print("FATAL: %s" % errormessage)
+    sys.exit(-10)
+
+
+def get_test_stub():
+    return {'meta': {}, 'environment': {}}
+
+
+def get_full_stub():
+    return {'global': get_test_stub(), 'testsets': {}, 'output_format': 'text'}
+
+
+##############################################################################
+#                                                                            #
 # helper functions for setting up logging                                    #
 #                                                                            #
 ##############################################################################

@@ -14,24 +14,11 @@ config = None
 logger = None
 
 
-def fail(errormessage):
-    print("FATAL: %s" % errormessage)
-    sys.exit(-10)
-
-
 ##############################################################################
 #                                                                            #
 # default configuration values for test config                               #
 #                                                                            #
 ##############################################################################
-
-
-def get_test_config_stub():
-    return {'config': {}, 'meta': {}, 'environment': {}}
-
-
-def get_full_config_stub():
-    return {'global': get_test_config_stub(), 'testsets': {}, 'output_format': 'text'}
 
 
 ##############################################################################
@@ -65,7 +52,7 @@ def get_test_set_groups(setupdata):
                 else tsname
             tsglobal = tools.deep_merge(
                 global_config,
-                tests.pop("_global", get_test_config_stub()))
+                tests.pop("_global", tools.get_test_stub()))
             ts = Testset(global_config=tsglobal, name=tsname)
             tsgroup_list.append(ts)
             for test_name, test_config in tests.items():
@@ -75,7 +62,7 @@ def get_test_set_groups(setupdata):
 
 
 def _get_setupdata():
-    stub = get_full_config_stub()
+    stub = tools.get_full_stub()
     filedata = None
     try:
         with open(config.config_file, "r") as ifile:
@@ -83,9 +70,9 @@ def _get_setupdata():
     except IOError as e:
         # FileNotFoundError is python3 only. yihah.
         if e.errno == ENOENT:
-            fail("Could not find configuration file: %s" % config.config_file)
+            tools.fail("Could not find configuration file: %s" % config.config_file)
         else:
-            fail("Unspecified IO error: %s" % str(e))
+            tools.fail("Unspecified IO error: %s" % str(e))
     logger.info("Read configuration file %s" % config.config_file)
     return tools.deep_merge(stub, filedata)
 
