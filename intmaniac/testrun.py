@@ -135,21 +135,20 @@ class Testrun(threading.Thread):
         self.results.append(rv)
 
     def cleanup(self):
-        cleanup = True
         for cmd in ("docker-compose kill", "docker-compose rm -f"):
             try:
                 self.log.debug("cleanup command: %s" % cmd)
                 rv = self.run_command(cmd.split(" "))
             except sp.CalledProcessError as e:
                 rv = e
-                cleanup = False
             if not rv.returncode == 0:
-                self.log.warning("cleanup command '%s' failed. code %d, output: %s"
-                                 % (" ".join(rv.args),
-                                    rv.returncode,
-                                    str(rv.stdout)))
-        if not cleanup:
-            self.log.error("cleanup failed")
+                command = " ".join(rv.args) \
+                    if type(rv.args) == list \
+                    else rv.argsj
+                self.log.error("cleanup command '%s' failed. code %d, output: \n%s"
+                               % (command,
+                                  rv.returncode,
+                                  str(rv.stdout).strip()))
 
     def run(self):
         success = True
