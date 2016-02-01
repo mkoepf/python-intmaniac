@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from intmaniac.tools import deep_merge, run_command, dbg_tr_get_testdir
-from intmaniac.tools import get_logger
+from intmaniac.tools import get_logger, destr
 from intmaniac.output import output
 
 import copy
@@ -193,7 +193,7 @@ class Testrun(threading.Thread):
                                if self.exception
                                else "Test output following",
                                details="No details available")
-        output.test_stdout("\n".join([r.stdout.decode('utf-8') for r in self.results]))
+        output.test_stdout("\n".join([destr(r.stdout) for r in self.results]))
         output.test_done()
 
 if __name__ == "__main__":

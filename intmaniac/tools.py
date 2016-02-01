@@ -94,6 +94,22 @@ def deep_merge(d0, d1):
 
 ##############################################################################
 #                                                                            #
+# a couple of string helpers (py2 vs py3)                                    #
+#                                                                            #
+##############################################################################
+
+
+def destr(sob):
+    """Will detect if a parameter is a str of bytes data type and decode (in
+    case of bytes) or just use it (in case of str)
+    :param sob a bytes or string object"""
+    # "sob" means "string or bytes"
+    tmp = sob.decode("utf-8") if type(sob) == bytes else sob
+    return tmp.strip()
+
+
+##############################################################################
+#                                                                            #
 # python 2, <3.5 and 3.5+ "subprocess.run() / popen.run()" handler           #
 # with unified behavior                                                      #
 #                                                                            #
