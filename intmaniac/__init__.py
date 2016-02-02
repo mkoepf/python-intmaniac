@@ -105,6 +105,7 @@ def _get_and_init_configuration():
     setupdata = _get_setupdata()
     _prepare_overrides()
     if "output_format" in setupdata:
+        logger.warning("Text output format: %s" % setupdata['output_format'])
         init_output(setupdata['output_format'])
     return setupdata
 

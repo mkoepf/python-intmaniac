@@ -2,7 +2,7 @@
 
 from intmaniac.testrun import Testrun
 from intmaniac.tools import deep_merge
-from intmaniac.output import output
+from intmaniac import output
 
 import logging as log
 from threading import Thread
@@ -51,10 +51,10 @@ class Testset(Thread):
         return self.success
 
     def dump(self):
-        output.test_suite_open(self.name)
+        output.output.test_suite_open(self.name)
         for test in self.tests:
             test.dump()
-        output.test_suite_done()
+        output.output.test_suite_done()
 
 if __name__ == "__main__":
     print("Don't do this :)")
