@@ -1,7 +1,7 @@
 #!/usr/bin/env pythpn
 
-from intmaniac import prepare_environment, get_test_set_groups
-from intmaniac import get_and_init_configuration
+from intmaniac import _prepare_environment, _get_test_set_groups
+from intmaniac import _get_and_init_configuration
 from intmaniac.tools import enable_debug
 
 import unittest
@@ -11,9 +11,9 @@ class TestTemplateEmpty(unittest.TestCase):
 
     def setUp(self):
         enable_debug()
-        prepare_environment("-c testdata/testconfig_empty.yaml".split())
-        config = get_and_init_configuration()
-        self.tsgs = get_test_set_groups(config)
+        _prepare_environment("-c testdata/testconfig_empty.yaml".split())
+        config = _get_and_init_configuration()
+        self.tsgs = _get_test_set_groups(config)
 
     def testNumberOfTestsetsCreated(self):
         tsgs = self.tsgs
@@ -27,9 +27,9 @@ class TestTemplateArrayTriple(unittest.TestCase):
 
     def setUp(self):
         enable_debug()
-        prepare_environment("-c testdata/testconfig_array_triple.yaml".split())
-        config = get_and_init_configuration()
-        self.tsgs = get_test_set_groups(config)
+        _prepare_environment("-c testdata/testconfig_array_triple.yaml".split())
+        config = _get_and_init_configuration()
+        self.tsgs = _get_test_set_groups(config)
 
     def test_created_testset_groups(self):
         tsgs = self.tsgs
@@ -67,9 +67,9 @@ class TestTemplateKeysTriple(unittest.TestCase):
 
     def setUp(self):
         enable_debug()
-        prepare_environment("-c testdata/testconfig_keys_triple.yaml".split())
-        config = get_and_init_configuration()
-        self.tsgs = get_test_set_groups(config)
+        _prepare_environment("-c testdata/testconfig_keys_triple.yaml".split())
+        config = _get_and_init_configuration()
+        self.tsgs = _get_test_set_groups(config)
 
     def test_created_testset_groups(self):
         tsgs = self.tsgs
@@ -104,9 +104,9 @@ class TestTemplateSubglobals(unittest.TestCase):
     def setUp(self):
         enable_debug()
         self.test_data = "testdata/testconfig_sub_globals.yaml"
-        prepare_environment(["-c", self.test_data])
-        config = get_and_init_configuration()
-        self.tsgs = get_test_set_groups(config)
+        _prepare_environment(["-c", self.test_data])
+        config = _get_and_init_configuration()
+        self.tsgs = _get_test_set_groups(config)
 
     def test_subglobal_propagation(self):
         meta_dict = [

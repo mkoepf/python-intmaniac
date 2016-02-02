@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-from intmaniac import prepare_environment, get_test_set_groups
-from intmaniac import get_and_init_configuration
+from intmaniac import _prepare_environment, _get_test_set_groups
+from intmaniac import _get_and_init_configuration
 from intmaniac.testrun import Testrun
 from intmaniac.tools import enable_debug, _construct_return_object
 
@@ -40,9 +40,9 @@ class TestSimpleExecution(unittest.TestCase):
 
     @unittest.skipUnless(mock_available, "No mocking available in this Python version")
     def test_one_testrun_with_cleanup(self):
-        prepare_environment("-c testdata/real_simple_config.yaml -vvvvv".split())
-        config = get_and_init_configuration()
-        tsgs = get_test_set_groups(config)
+        _prepare_environment("-c testdata/real_simple_config.yaml -vvvvv".split())
+        config = _get_and_init_configuration()
+        tsgs = _get_test_set_groups(config)
         with patch("intmaniac.testrun.run_command") as mock:
             mock.side_effect = [
                 # args, returncode, stdout is the constructor.
@@ -68,9 +68,9 @@ class TestSimpleExecution(unittest.TestCase):
     @unittest.skipUnless(mock_available,
                          "No mocking available in this Python version")
     def test_for_allowed_failure(self):
-        prepare_environment("-c testdata/real_simple_config.yaml -vvvvv".split())
-        config = get_and_init_configuration()
-        tsgs = get_test_set_groups(config)
+        _prepare_environment("-c testdata/real_simple_config.yaml -vvvvv".split())
+        config = _get_and_init_configuration()
+        tsgs = _get_test_set_groups(config)
         tst = tsgs[0][0].tests[0]
         # we inject the allow_failure attribute here.
         tst.test_meta['allow_failure'] = True

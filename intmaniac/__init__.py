@@ -32,7 +32,7 @@ global_overrides = None
 ##############################################################################
 
 
-def get_test_set_groups(setupdata):
+def _get_test_set_groups(setupdata):
     """Always returns a list of list of Testsets
         :param setupdata the full yaml setup data
     """
@@ -101,7 +101,7 @@ def _prepare_overrides():
             tools.fail("Invalid environment setting: %s" % tmp)
 
 
-def get_and_init_configuration():
+def _get_and_init_configuration():
     setupdata = _get_setupdata()
     _prepare_overrides()
     init_output(setupdata['output_format'])
@@ -115,7 +115,7 @@ def get_and_init_configuration():
 ##############################################################################
 
 
-def run_test_set_groups(tsgs):
+def _run_test_set_groups(tsgs):
     retval = True
     dumps = []
     for testsetgroup in tsgs:
@@ -147,7 +147,7 @@ def run_test_set_groups(tsgs):
 ##############################################################################
 
 
-def prepare_environment(arguments):
+def _prepare_environment(arguments):
     global config, logger, derived_basedir
     parser = ArgumentParser()
     parser.add_argument("-c", "--config-file",
@@ -171,9 +171,9 @@ def prepare_environment(arguments):
 
 
 def console_entrypoint():
-    prepare_environment(sys.argv[1:])
-    configuration = get_and_init_configuration()
-    result = run_test_set_groups(get_test_set_groups(configuration))
+    _prepare_environment(sys.argv[1:])
+    configuration = _get_and_init_configuration()
+    result = _run_test_set_groups(_get_test_set_groups(configuration))
     if not result:
         sys.exit(1)
 
