@@ -40,7 +40,7 @@ testsets:
 
         # optional. test environment configuration.
         environment:
-          companion0: hub.cognotekt.int:5000/production/rsas:latest
+          companion0: my_container:latest
 
         # optional. test configuration
         meta:
@@ -50,4 +50,4 @@ testsets:
   - default:
       demo:
         environment:
-          companion0: hub.cognotekt.int:5000/production/rsas:demo
+          companion0: my_container:demo
