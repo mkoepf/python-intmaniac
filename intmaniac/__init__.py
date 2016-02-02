@@ -7,11 +7,14 @@ from intmaniac import tools
 from intmaniac.output import init_output
 
 import sys
+from os.path import join
 from errno import *
 from argparse import ArgumentParser
 
 config = None
 logger = None
+derived_basedir = None
+global_overrides = None
 
 
 ##############################################################################
@@ -50,12 +53,17 @@ def get_test_set_groups(setupdata):
             tsname = "%02d-%s" % (step, tsname) \
                 if len(test_set_groups) > 1 \
                 else tsname
-            tsglobal = tools.deep_merge(
-                global_config,
-                tests.pop("_global", tools.get_test_stub()))
-            ts = Testset(global_config=tsglobal, name=tsname)
+            ts = Testset(name=tsname)
             tsgroup_list.append(ts)
+            # remove global settings from test set
+            tset_globals = tests.pop("_global") if "_global" in tests else {}
             for test_name, test_config in tests.items():
+                test_config = tools.deep_merge(
+                    global_config,
+                    tset_globals,
+                    test_config,
+                    global_overrides
+                )
                 ts.add_from_config(test_name, test_config)
         step += 1
     return rv
@@ -77,24 +85,25 @@ def _get_setupdata():
     return tools.deep_merge(stub, filedata)
 
 
-def _prepare_global_config(setupdata):
-    global_config = setupdata['global']
-    # add config file location
-    global_config['meta']['_configfile'] = config.config_file
+def _prepare_overrides():
+    global global_overrides
+    global_overrides = tools.get_test_stub()
+    # add config file entry
+    global_overrides['meta']['_configfile'] = config.config_file
+    # add test_basedir entry
+    global_overrides['meta']['test_basedir'] = derived_basedir
     # add env settings from command line
-    if config.env:
-        for tmp in config.env:
-            try:
-                k, v = tmp.split("=", 1)
-                global_config['environment'][k] = v
-            except ValueError:
-                fail("Invalid environment setting: %s" % tmp)
-    return global_config
+    for tmp in config.env:
+        try:
+            k, v = tmp.split("=", 1)
+            global_overrides['environment'][k] = v
+        except ValueError:
+            tools.fail("Invalid environment setting: %s" % tmp)
 
 
 def get_and_init_configuration():
     setupdata = _get_setupdata()
-    _prepare_global_config(setupdata)
+    _prepare_overrides()
     init_output(setupdata['output_format'])
     return setupdata
 
@@ -139,21 +148,25 @@ def run_test_set_groups(tsgs):
 
 
 def prepare_environment(arguments):
-    global config, logger
+    global config, logger, derived_basedir
     parser = ArgumentParser()
     parser.add_argument("-c", "--config-file",
                         help="specify configuration file",
                         default="./intmaniac.yaml")
     parser.add_argument("-e", "--env",
                         help="dynamically add a value to the environment",
+                        default=[],
                         action="append")
     parser.add_argument("-v", "--verbose",
                         help="increase verbosity level, use multiple times",
                         default=0,
                         action="count")
+    parser.add_argument("-t", "--temp-output-dir",
+                        help="run tests from here, defaults to $pwd/intmaniac")
     config = parser.parse_args(arguments)
     tools.init_logging(config)
-    logger = tools.get_logger(__name__)
+    derived_basedir = tools.setup_up_test_directory(config)
+    logger = tools.get_logger(__name__, filename=derived_basedir)
 
 
 def console_entrypoint():

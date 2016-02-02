@@ -31,7 +31,8 @@ class TestSimpleExecution(unittest.TestCase):
 
     def setUp(self):
         enable_debug()
-        self.test_dir = os.path.realpath("/tmp/ignoreme/real-test1")
+        self.test_basedir = "/tmp/intmaniac_%s" % os.getpid()
+        self.test_dir = os.path.join(self.test_basedir, "real-test1")
         self.base_cmdline = [
             'docker-compose', 'run', '-e',
             "test_dir=%s" % self.test_dir,
@@ -51,8 +52,8 @@ class TestSimpleExecution(unittest.TestCase):
             ]
             expected_calls = [
                 call(self.base_cmdline+"echo hi".split(), cwd=self.test_dir),
-                call("docker-compose kill".split(" ")),
-                call("docker-compose rm -f".split(" ")),
+                call("docker-compose kill".split(" "), cwd=self.test_dir),
+                call("docker-compose rm -f".split(" "), cwd=self.test_dir),
             ]
             result = tsgs[0][0].run()
             # if you step through here with the IDE the results will be

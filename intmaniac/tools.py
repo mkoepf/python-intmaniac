@@ -2,13 +2,14 @@
 
 from intmaniac.defaults import *
 
+import os
 import os.path
 import functools
 import subprocess as sp
 import logging as log
-from sys import version_info as vinf
+import sys
 
-python_version = 10 * vinf[0] + vinf[1]
+python_version = 10 * sys.version_info[0] + sys.version_info[1]
 debug = False
 
 
@@ -207,6 +208,22 @@ def run_command(command, *args, **kwargs):
 # during debug runs                                                          #
 #                                                                            #
 ##############################################################################
+
+
+def setup_up_test_directory(config):
+    td = os.path.join(os.getcwd(), "intmaniac_%s" % os.getpid()) \
+        if not config.temp_output_dir \
+        else config.temp_output_dir
+    if debug:
+        # yup, just overwrite it when debugging. but this way the code above
+        # is actually tested.
+        td = "/tmp/intmaniac_%s" % os.getpid()
+    if not os.path.isdir(td) and not debug:
+        try:
+            os.makedirs(td)
+        except IOError:
+            fail("Error creating test base directory '%s'" % td)
+    return td
 
 
 def dbg_tr_get_testdir(basedir, testname):
