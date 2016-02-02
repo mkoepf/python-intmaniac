@@ -4,7 +4,7 @@ import yaml
 
 from intmaniac.testset import Testset
 from intmaniac import tools
-from intmaniac.output import init_output
+from intmaniac import output
 
 import sys
 from os.path import join
@@ -106,7 +106,7 @@ def _get_and_init_configuration():
     _prepare_overrides()
     if "output_format" in setupdata:
         logger.warning("Text output format: %s" % setupdata['output_format'])
-        init_output(setupdata['output_format'])
+        output.init_output(setupdata['output_format'])
     return setupdata
 
 
@@ -136,7 +136,7 @@ def _run_test_set_groups(tsgs):
             if not testsetobj.succeeded():
                 logger.critical("%s failed, skipping following testsets"
                              % testsetobj)
-    print("TEST PROTOCOL")
+    output.output.message("Test protocol")
     for dump_function in dumps:
         dump_function()
     return retval
