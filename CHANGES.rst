@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+0.8.0
+-----
+
+- TeamCity outputs pretty sensbile now
+
+
 0.7.0
 -----
 
