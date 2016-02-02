@@ -7,27 +7,42 @@ global:
   meta:
     docker_compose_template: docker-compose.yml.tmpl
     docker_compose_params: # optional. a list of parameters to docker-compose
-    test_service: # REQUIRED. the service in the docker-compose which is executed with tests
-    test_commands: # optional. executed one-by-one, all must succeed.
-                   # if not given the service will be "run" and expected to return
-                   # true (0) or false (1), which will be used as test result
-# either dict or array allowed.
-# internally, a dict is wrapped into an array (one more layer).
-# all tests sets in a dict are executed in parallel,
-# the outer array in serial
+
+    # optional. defaults to "test-service" if not there. the docker-compose
+    #           service on which all the test commands are executed.
+    test_service: ""
+
+    # optional. array of test commands. each command can be a string or a list
+    #           the return value of the command determines whether the test
+    #           failed or succeeded.
+    #           if no commands are given the service is just "run"
+    test_commands: []
+
+
+# REQUIRED. either dict or list allowed. if it's a dict it will be placed
+#           in a list. the list items are executed sequentially, all dict
+#           items are executed in parallel.
 testsets:
+    # just names, no special meaning.
   - default:
+
+      # optional. a sub-set of global values, which overwrite the top-global
+      #           values if present, and are overwritten by test-specific
+      #           values.
+      _global: {}
+
+      # a test
       latest:
-        # available as TEST_COMPANION_x in the environment of the
-        # docker-compose run, AND the following strings will be replaced
-        # in the docker-compose template: %%COMPANION_x%%
+
+        # optional. test environment configuration.
         environment:
           companion0: hub.cognotekt.int:5000/production/rsas:latest
-        # overwrite global config settings if needed. if not, global
-        # settings are used.
+
+        # optional. test configuration
         meta:
           docker_compose_template: /some/other/template.yaml
           allow_failure: true
+
   - default:
       demo:
         environment:
