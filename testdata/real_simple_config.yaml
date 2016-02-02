@@ -1,7 +1,6 @@
 ---
 global:
   meta:
-    test_basedir: /tmp/ignoreme
     docker_compose_template: ../testdata/real_simple_compose.yml
 
 testsets:

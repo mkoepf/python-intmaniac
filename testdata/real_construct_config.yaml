@@ -6,7 +6,6 @@ global:
   meta:
     # this is always relative to the config file, which is here.
     docker_compose_template: real_construct_compose.yml
-    test_basedir: ../ignoreme
 
 testsets:
 
