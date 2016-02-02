@@ -136,9 +136,10 @@ def _run_test_set_groups(tsgs):
             if not testsetobj.succeeded():
                 logger.critical("%s failed, skipping following testsets"
                              % testsetobj)
-    output.output.message("Test protocol")
+    output.output.block_open("Test protocol")
     for dump_function in dumps:
         dump_function()
+    output.output.block_done()
     return retval
 
 

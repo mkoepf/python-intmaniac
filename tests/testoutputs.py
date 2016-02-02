@@ -19,7 +19,7 @@ except ImportError:
 # did I mention this sucks?
 
 
-class TestWTF(unittest.TestCase):
+class TestOutputs(unittest.TestCase):
 
     @unittest.skipUnless(mock_available, "No mocking available")
     def test_teamcity_output(self):

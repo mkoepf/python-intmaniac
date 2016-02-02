@@ -1,4 +1,3 @@
-import sys
 
 
 class GenericOutput:
@@ -18,6 +17,12 @@ class GenericOutput:
         self.open_test_suits = []
         self.open_blocks = []
 
+    # name format helper
+
+    @staticmethod
+    def format_name(name):
+        return name
+
     # generic message
 
     def message(self, s, details='-', status='-'):
@@ -28,8 +33,9 @@ class GenericOutput:
     # generic grouping of output
 
     def block_open(self, s):
-        self.dump(self.str_block_open.format(name=s))
-        self.open_blocks.append(s)
+        name = self.format_name(s)
+        self.dump(self.str_block_open.format(name=name))
+        self.open_blocks.append(name)
 
     def block_done(self):
         self.dump(self.str_block_done.format(name=self.open_blocks.pop()))
@@ -37,8 +43,9 @@ class GenericOutput:
     # test suites
 
     def test_suite_open(self, s):
-        self.dump(self.str_test_suite_open.format(name=s))
-        self.open_test_suits.append(s)
+        name = self.format_name(s)
+        self.dump(self.str_test_suite_open.format(name=name))
+        self.open_test_suits.append(name)
 
     def test_suite_done(self):
         self.dump(self.str_test_suite_done.format(name=self.open_test_suits.pop()))
@@ -46,8 +53,9 @@ class GenericOutput:
     # test_open, ONE of the middle methods, then test_done
 
     def test_open(self, s):
-        self.dump(self.str_test_open.format(name=s))
-        self.open_tests.append(s)
+        name = self.format_name(s)
+        self.dump(self.str_test_open.format(name=name))
+        self.open_tests.append(name)
 
     def test_stdout(self, s):
         self.dump(self.str_test_stdout.format(text=s.strip(),
@@ -70,7 +78,5 @@ class GenericOutput:
 
     @staticmethod
     def dump(*args):
-        #sys.stdout.write(*args)
-        #sys.stdout.write("\n")
         thing = "".join(args)
         print(thing)
