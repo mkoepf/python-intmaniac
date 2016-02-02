@@ -18,6 +18,10 @@ global:
     #           if no commands are given the service is just "run"
     test_commands: []
 
+    # optional - commands before and after the test run. intended for
+    #            global settings
+    test_before:   [] # commands (list of str or lists) executed before the test
+    test_after:    [] # commands (list of str or lists) executed after the test
 
 # REQUIRED. either dict or list allowed. if it's a dict it will be placed
 #           in a list. the list items are executed sequentially, all dict

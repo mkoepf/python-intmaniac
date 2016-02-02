@@ -40,18 +40,22 @@ class TestSimpleExecution(unittest.TestCase):
 
     @unittest.skipUnless(mock_available, "No mocking available in this Python version")
     def test_one_testrun_with_cleanup(self):
-        _prepare_environment("-c testdata/real_simple_config.yaml -vvvvv".split())
+        _prepare_environment("-c testdata/real_simple_with_setupteardown.yaml -vvvvv".split())
         config = _get_and_init_configuration()
         tsgs = _get_test_set_groups(config)
         with patch("intmaniac.testrun.run_command") as mock:
             mock.side_effect = [
                 # args, returncode, stdout is the constructor.
+                _construct_return_object(0, [], "ho1"),
                 _construct_return_object(0, [], "hi"),
+                _construct_return_object(0, [], "ho2"),
                 _construct_return_object(0, [], None),
                 _construct_return_object(0, [], None),
             ]
             expected_calls = [
+                call(self.base_cmdline+"sleep 1".split(), cwd=self.test_dir),
                 call(self.base_cmdline+"echo hi".split(), cwd=self.test_dir),
+                call(self.base_cmdline+"sleep 2".split(), cwd=self.test_dir),
                 call("docker-compose kill".split(" "), cwd=self.test_dir),
                 call("docker-compose rm -f".split(" "), cwd=self.test_dir),
             ]
@@ -59,7 +63,7 @@ class TestSimpleExecution(unittest.TestCase):
             # if you step through here with the IDE the results will be
             # fucked. cause the IDE interferes with the mock.
             # just so you remember.
-            self.assertEqual(3, len(mock.mock_calls))
+            self.assertEqual(5, len(mock.mock_calls))
             self.assertEqual(expected_calls, mock.mock_calls)
         for test in tsgs[0][0].tests:
             self.assertIsNone(test.exception)
@@ -80,6 +84,12 @@ class TestSimpleExecution(unittest.TestCase):
                 _construct_return_object(0, [], None),
                 _construct_return_object(0, [], None),
             ]
+            expected_calls = [
+                call(self.base_cmdline+"echo hi".split(), cwd=self.test_dir),
+                call("docker-compose kill".split(" "), cwd=self.test_dir),
+                call("docker-compose rm -f".split(" "), cwd=self.test_dir),
+            ]
             result = tst.run()
         self.assertTrue(result)
         self.assertEqual(Testrun.CONTROLLED_FAILURE, tst.state)
+        self.assertEqual(expected_calls, mock.mock_calls)

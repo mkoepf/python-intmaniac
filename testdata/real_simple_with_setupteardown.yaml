@@ -1,0 +1,15 @@
+---
+global:
+  meta:
+    docker_compose_template: ../testdata/real_simple_compose.yml
+
+testsets:
+  real:
+    test1:
+      meta:
+        test_before:
+          - sleep 1
+        test_commands:
+          - echo hi
+        test_after:
+          - sleep 2

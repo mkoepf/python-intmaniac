@@ -154,13 +154,14 @@ class Testrun(threading.Thread):
         success = True
         try:
             self.init_environment()
-            if len(self.test_meta['test_commands']) > 0:
-                for cmd in self.test_meta['test_commands']:
-                    cmd = cmd.split(" ") if type(cmd) == str else cmd
-                    self.log.info("command '%s'" % " ".join(cmd))
-                    self.run_test_command(cmd)
-            else:
-                self.run_test_command()
+            commands = []
+            commands.extend(self.test_meta.get('test_before', []))
+            commands.extend(self.test_meta.get('test_commands', [None]))
+            commands.extend(self.test_meta.get('test_after', []))
+            for cmd in commands:
+                cmd = cmd.split(" ") if type(cmd) == str else cmd
+                self.log.info("command '%s'" % " ".join(cmd))
+                self.run_test_command(cmd)
         except IOError as e:
             self.exception = e
             success = False
