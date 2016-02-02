@@ -104,7 +104,8 @@ def _prepare_overrides():
 def _get_and_init_configuration():
     setupdata = _get_setupdata()
     _prepare_overrides()
-    init_output(setupdata['output_format'])
+    if "output_format" in setupdata:
+        init_output(setupdata['output_format'])
     return setupdata
 
 

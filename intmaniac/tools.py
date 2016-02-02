@@ -30,7 +30,7 @@ def get_test_stub():
 
 
 def get_full_stub():
-    return {'global': get_test_stub(), 'testsets': {}, 'output_format': 'text'}
+    return {'version': '1.0', 'global': get_test_stub(), 'testsets': {}}
 
 
 ##############################################################################
