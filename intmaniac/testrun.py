@@ -144,7 +144,7 @@ class Testrun(threading.Thread):
             if not rv.returncode == 0:
                 command = " ".join(rv.args) \
                     if type(rv.args) == list \
-                    else rv.argsj
+                    else rv.args
                 self.log.error("cleanup command '%s' failed. code %d, output: \n%s"
                                % (command,
                                   rv.returncode,

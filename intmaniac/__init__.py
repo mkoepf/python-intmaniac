@@ -162,11 +162,12 @@ def prepare_environment(arguments):
                         default=0,
                         action="count")
     parser.add_argument("-t", "--temp-output-dir",
-                        help="run tests from here, defaults to $pwd/intmaniac")
+                        help="test dir location, default: $pwd/intmaniac")
     config = parser.parse_args(arguments)
     tools.init_logging(config)
     derived_basedir = tools.setup_up_test_directory(config)
-    logger = tools.get_logger(__name__, filename=derived_basedir)
+    logger = tools.get_logger(__name__,
+                              filename=join(derived_basedir, "root.log"))
 
 
 def console_entrypoint():
