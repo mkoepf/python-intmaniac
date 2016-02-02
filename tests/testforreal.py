@@ -39,7 +39,7 @@ class TestSimpleExecution(unittest.TestCase):
             '--rm', 'test-service']
 
     @unittest.skipUnless(mock_available, "No mocking available in this Python version")
-    def test_single_container_setup(self):
+    def test_one_testrun_with_cleanup(self):
         prepare_environment("-c testdata/real_simple_config.yaml -vvvvv".split())
         config = get_and_init_configuration()
         tsgs = get_test_set_groups(config)
