@@ -50,10 +50,12 @@ class GenericOutput:
         self.open_tests.append(s)
 
     def test_stdout(self, s):
-        self.dump(self.str_test_stdout.format(text=s.strip()))
+        self.dump(self.str_test_stdout.format(text=s.strip(),
+                                              name=self.open_tests[-1]))
 
     def test_stderr(self, s):
-        self.dump(self.str_test_stderr.format(text=s.strip()))
+        self.dump(self.str_test_stderr.format(text=s.strip(),
+                                              name=self.open_tests[-1]))
 
     def test_failed(self, type="GenericFailure", message="No reason available", details="No details available"):
         self.dump(self.str_test_fail.format(name=self.open_tests[-1],
@@ -68,5 +70,7 @@ class GenericOutput:
 
     @staticmethod
     def dump(*args):
-        sys.stdout.write(*args)
-        sys.stdout.write("\n")
+        #sys.stdout.write(*args)
+        #sys.stdout.write("\n")
+        thing = "".join(args)
+        print(thing)
