@@ -22,3 +22,10 @@ class TestDeepMerge(unittest.TestCase):
         d1 = {1: {4: 5, 3: 3}, 8: 9}
         result = {1: {2: 3, 3: 3, 4: 5}, 7: 8, 8: 9}
         self.assertDictEqual(deep_merge(d0, d1), result)
+
+    def test_more_than_two_arguments(self):
+        d0 = {1: 2, 2: 3, 3: 4            }
+        d1 = {      2: 4, 3: 5, 4: 6      }
+        d2 = {            3: 6,       5: 8}
+        rs = {1: 2, 2: 4, 3: 6, 4: 6, 5: 8}
+        self.assertDictEqual(rs, deep_merge(d0, d1, d2))

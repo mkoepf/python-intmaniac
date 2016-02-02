@@ -3,6 +3,7 @@
 from intmaniac.defaults import *
 
 import os.path
+import functools
 import subprocess as sp
 import logging as log
 from sys import version_info as vinf
@@ -100,7 +101,7 @@ class Toolslogger:
 ##############################################################################
 
 
-def deep_merge(d0, d1):
+def _deep_merge(d0, d1):
     d = {}
     for k, v in d1.items():
         if type(v) == dict and k in d0 and type(d0[k]) == dict:
@@ -111,6 +112,10 @@ def deep_merge(d0, d1):
         if k not in d1:
             d[k] = v
     return d
+
+
+def deep_merge(*args):
+    return functools.reduce(_deep_merge, args, {})
 
 
 ##############################################################################
