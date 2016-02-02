@@ -1,10 +1,17 @@
 CHANGELOG
 =========
 
+0.7.0
+-----
+
+- added configuration fields ``test_before`` and ``test_after``
+- won't mention "cleanup and bugfixes" any more
+
+
 0.6.0
 -----
 
-- changed test directory logic, is now `$pwd/intmaniac_$PID` by default
+- changed test directory logic, is now ``$pwd/intmaniac_$PID`` by default
 - command line settings override everything now
 - fixed a couple of bugs
 - internal restructuring
