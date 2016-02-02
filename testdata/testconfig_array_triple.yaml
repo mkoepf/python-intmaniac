@@ -9,14 +9,18 @@ testsets:
       test1:
         environment:
           "1": "1"
+          "0": no good
       test2:
         environment:
           "2": "2"
+          "0": no good
     ts2:
       test3:
         environment:
           "3": "3"
+          "0": no good
   - ts3:
       test4:
         environment:
           "4": "4"
+          "0": no good

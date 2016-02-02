@@ -27,7 +27,7 @@ class TestTemplateArrayTriple(unittest.TestCase):
 
     def setUp(self):
         enable_debug()
-        _prepare_environment("-c testdata/testconfig_array_triple.yaml".split())
+        _prepare_environment("-c testdata/testconfig_array_triple.yaml -e 0=well".split())
         config = _get_and_init_configuration()
         self.tsgs = _get_test_set_groups(config)
 
@@ -58,6 +58,7 @@ class TestTemplateArrayTriple(unittest.TestCase):
                     tname = "%02d-ts%d-test%d" % (tlcount, tscount, tcount)
                     self.assertEqual(tname, test.name)
                     self.assertEqual(test.test_env[str(tcount)], str(tcount))
+                    self.assertEqual("well", test.test_env["0"])
                     tcount += 1
                 tscount += 1
             tlcount += 1
