@@ -4,7 +4,7 @@ MANIFEST
 *.egg-info
 build/
 __pycache__
-output/
+/output/
 
 # project data
 ignoreme/
