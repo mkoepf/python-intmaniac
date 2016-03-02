@@ -100,25 +100,13 @@ def _get_and_init_configuration():
 ##############################################################################
 
 
-def _run_test_set_groups(tsgs):
+def _run_test_sets(testsets):
     retval = True
     dumps = []
-    for testsetgroup in tsgs:
-        if not retval:
-            # just for nicer output
-            for tso in testsetgroup:
-                logger.warning("skipping %s because of failed dependency" % tso)
-            continue
-        # everything in here is run in parallel
-        for testsetobj in testsetgroup:
-            testsetobj.start()
-        for testsetobj in testsetgroup:
-            testsetobj.join()
-            retval = testsetobj.succeeded() and retval
-            dumps.append(testsetobj.dump)
-            if not testsetobj.succeeded():
-                logger.critical("%s failed, skipping following testsets"
-                             % testsetobj)
+    for testset in testsets:
+        testset.run()
+        retval = testset.succeeded() and retval
+        dumps.append(testset.dump)
     output.output.block_open("Test protocol")
     for dump_function in dumps:
         dump_function()
@@ -156,13 +144,13 @@ def _prepare_environment(arguments):
                               filename=join(derived_basedir, "root.log"))
 
 
-def console_entrypoint():
-    _prepare_environment(sys.argv[1:])
+def console_entrypoint(args):
+    _prepare_environment(args)
     configuration = _get_and_init_configuration()
-    result = _run_test_set_groups(_get_test_sets(configuration))
+    result = _run_test_sets(_get_test_sets(configuration))
     if not result:
         sys.exit(1)
 
 
 if __name__ == "__main__":
-    console_entrypoint()
+    console_entrypoint(sys.argv[1:])
