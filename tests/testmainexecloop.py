@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 
-from intmaniac import console_entrypoint
-from intmaniac.testrun import Testrun
-from intmaniac.tools import enable_debug, _construct_return_object
+from intmaniac import _internal_entrypoint
+from intmaniac.tools import enable_debug
 
 import unittest
 import os
@@ -35,7 +34,8 @@ class TestMainExecLoop(unittest.TestCase):
         testsets = [MagicMock(), MagicMock(), MagicMock()]
         with patch("intmaniac._get_test_sets") as mock:
             mock.return_value = testsets
-            console_entrypoint("-c testdata/command_exec_test.yaml -vvvvv".split())
+            _internal_entrypoint("-c testdata/command_exec_test.yaml "
+                                 "-vvvvv".split())
         for test in testsets:
             self.assertTrue(test.run.called)
 

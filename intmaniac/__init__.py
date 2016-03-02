@@ -144,9 +144,13 @@ def _prepare_environment(arguments):
                               filename=join(derived_basedir, "root.log"))
 
 
-def console_entrypoint(args):
+def _internal_entrypoint(args):
     _prepare_environment(args)
     configuration = _get_and_init_configuration()
     result = _run_test_sets(_get_test_sets(configuration))
     if not result:
         sys.exit(1)
+
+
+def console_entrypoint():
+    _internal_entrypoint(sys.argv[1:])
