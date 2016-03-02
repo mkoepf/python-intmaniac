@@ -33,6 +33,24 @@ default_config = {
 }
 
 
+def _build_exec_array(base=None):
+    """Will return a list containing lists containing words. Each inner list
+       is a single command to execute, which is split into words.
+       Example: [ ["sleep", "10"], [ "echo", "hi"] ]
+    """
+    if not base:
+        return []
+    if isinstance(base, str):
+        return [base.split(" ")]
+    elif isinstance(base, list) or isinstance(base, tuple):
+        tmp = list(base)
+        tmp = [item.split(" ") if isinstance(item, str) else item for item in tmp ]
+        return tmp
+    else:
+        raise ValueError("Can't construct command array out of this: %s"%
+                         str(base))
+
+
 class Testrun(object):
     """Actually invokes docker-compose with the information given in the
     configuration, and evaluates the results.
@@ -50,8 +68,13 @@ class Testrun(object):
         self.test_env = test_definition['environment']
         self.test_meta = test_definition['meta']
         self.test_commands = test_definition.get('test_commands', [])
-        if isinstance(self.test_commands, str):
-            self.test_commands = [self.test_commands]
+        # take care of commands ...
+        self.test_commands = _build_exec_array(self.test_commands)
+        self.test_meta['test_before'] = \
+            _build_exec_array(self.test_meta.get('test_before', None))
+        self.test_meta['test_after'] = \
+            _build_exec_array(self.test_meta.get('test_after', None))
+
         # okay.
         # let's keep all file references relative to the configuration
         # file. easy to remember.
@@ -122,10 +145,16 @@ class Testrun(object):
     def run_command(self, command):
         """convenience helper so we don't forget to include cwd.
         :param command the command to be executed."""
+        if not isinstance(command, list):
+            raise ValueError("Expected list for Testrun.run_command, not %s" %
+                             str(type(command)))
         return run_command(command, cwd=self.test_dir)
 
     def run_test_command(self, command=None):
         """:param command the command to execute as array"""
+        if command and not isinstance(command, list):
+            raise ValueError("Expected list for Testrun.run_test_command, not %s" %
+                             str(type(command)))
         if not command:
             command = self.commandline
         else:
@@ -141,10 +170,13 @@ class Testrun(object):
             except sp.CalledProcessError as e:
                 rv = e
             if not rv.returncode == 0:
-                command = " ".join(rv.args) \
-                    if type(rv.args) == list \
-                    else rv.args
-                self.log.error("cleanup command '%s' failed. code %d, output: \n%s"
+                if isinstance(rv, Exception):
+                    command = str(e)
+                else:
+                    command = " ".join(rv.args) if type(rv.args) == list \
+                                                else rv.args
+                self.log.error("cleanup command '%s' failed. "
+                               "code %d, output: \n%s"
                                % (command,
                                   rv.returncode,
                                   str(rv.stdout).strip()))
@@ -154,12 +186,10 @@ class Testrun(object):
         try:
             self.init_environment()
             commands = []
-            commands.extend(self.test_meta.get('test_before', []))
+            commands.extend(self.test_meta['test_before'])
             commands.extend(self.test_commands)
-            commands.extend(self.test_meta.get('test_after', []))
+            commands.extend(self.test_meta['test_after'])
             for cmd in commands:
-                cmd = cmd.split(" ") if type(cmd) == str else cmd
-                self.log.info("command '%s'" % " ".join(cmd))
                 self.run_test_command(cmd)
         except IOError as e:
             self.exception = e
