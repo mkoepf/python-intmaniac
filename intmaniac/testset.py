@@ -5,10 +5,9 @@ from intmaniac.tools import deep_merge
 from intmaniac import output
 
 import logging as log
-from threading import Thread
 
 
-class Testset(Thread):
+class Testset(object):
 
     def __repr__(self):
         return "<Testset '%s'>" % self.name
@@ -38,10 +37,7 @@ class Testset(Thread):
     def run(self):
         for test in self.tests:
             self.log.debug("starting test <%s>" % test.name)
-            test.start()
-        for test in self.tests:
-            test.join()
-            self.log.debug("joined test <%s>" % test.name)
+            test.run()
             if test.succeeded():
                 self.succeeded_tests.append(test)
             else:

@@ -5,7 +5,6 @@ from intmaniac.tools import get_logger, destr
 from intmaniac import output
 
 import copy
-import threading
 import shutil
 import subprocess as sp
 import os
@@ -34,7 +33,7 @@ default_config = {
 }
 
 
-class Testrun(threading.Thread):
+class Testrun(object):
     """Actually invokes docker-compose with the information given in the
     configuration, and evaluates the results.
     """
