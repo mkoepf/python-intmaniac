@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+0.9.2
+-----
+
+- Fixed bug which made invoking intmaniac impossible
+
+
 0.9.1
 -----
 
