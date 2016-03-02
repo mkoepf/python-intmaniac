@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+0.9.1
+-----
+
+- Fixed bug in main execution loop
+- Added test for main execution loop
+
+
 0.9.0
 -----
 
