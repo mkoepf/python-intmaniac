@@ -32,40 +32,23 @@ global_overrides = None
 ##############################################################################
 
 
-def _get_test_set_groups(setupdata):
+def _get_test_sets(setupdata):
     """Always returns a list of list of Testsets
         :param setupdata the full yaml setup data
     """
-    test_set_groups = setupdata['testsets']
+    testsets = setupdata['testsets']
     global_config = setupdata['global']
-    step = 0
     rv = []
-    # if it's not a list, just wrap it into one.
-    if type(test_set_groups) == dict:
-        test_set_groups = [test_set_groups]
-    for tsgroup in test_set_groups:
-        tsgroup_list = []
-        rv.append(tsgroup_list)
-        # this must be dict now
-        for tsname in sorted(tsgroup.keys()):
-            # makes for predictable order for testing ...
-            tests = tsgroup[tsname]
-            tsname = "%02d-%s" % (step, tsname) \
-                if len(test_set_groups) > 1 \
-                else tsname
-            ts = Testset(name=tsname)
-            tsgroup_list.append(ts)
-            # remove global settings from test set
-            tset_globals = tests.pop("_global") if "_global" in tests else {}
-            for test_name, test_config in tests.items():
-                test_config = tools.deep_merge(
-                    global_config,
-                    tset_globals,
-                    test_config,
-                    global_overrides
-                )
-                ts.add_from_config(test_name, test_config)
-        step += 1
+    for tsname, tests in sorted(testsets.items()):
+        ts = Testset(name=tsname)
+        rv.append(ts)
+        # remove global settings from test set
+        ts.set_global_config(tools.deep_merge(global_config,
+                                              tests.pop("_global", {})))
+        for test_name, test_config in tests.items():
+            # the overrides have precedence above everything
+            use_test_config = tools.deep_merge(test_config, global_overrides)
+            ts.add_from_config(test_name, use_test_config)
     return rv
 
 
@@ -176,7 +159,7 @@ def _prepare_environment(arguments):
 def console_entrypoint():
     _prepare_environment(sys.argv[1:])
     configuration = _get_and_init_configuration()
-    result = _run_test_set_groups(_get_test_set_groups(configuration))
+    result = _run_test_set_groups(_get_test_sets(configuration))
     if not result:
         sys.exit(1)
 

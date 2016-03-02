@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from intmaniac import _prepare_environment, _get_test_set_groups
+from intmaniac import _prepare_environment, _get_test_sets
 from intmaniac import _get_and_init_configuration
 from intmaniac.testrun import Testrun
 from intmaniac.tools import enable_debug, _construct_return_object
@@ -42,7 +42,7 @@ class TestSimpleExecution(unittest.TestCase):
     def test_one_testrun_with_cleanup(self):
         _prepare_environment("-c testdata/real_simple_with_setupteardown.yaml -vvvvv".split())
         config = _get_and_init_configuration()
-        tsgs = _get_test_set_groups(config)
+        testsets = _get_test_sets(config)
         with patch("intmaniac.testrun.run_command") as mock:
             mock.side_effect = [
                 # args, returncode, stdout is the constructor.
@@ -59,13 +59,15 @@ class TestSimpleExecution(unittest.TestCase):
                 call("docker-compose kill".split(" "), cwd=self.test_dir),
                 call("docker-compose rm -f".split(" "), cwd=self.test_dir),
             ]
-            result = tsgs[0][0].run()
+            result = testsets[0].run()
             # if you step through here with the IDE the results will be
             # fucked. cause the IDE interferes with the mock.
             # just so you remember.
             self.assertEqual(5, len(mock.mock_calls))
-            self.assertEqual(expected_calls, mock.mock_calls)
-        for test in tsgs[0][0].tests:
+            for want, act in zip(expected_calls, mock.mock_calls):
+                self.assertEqual(want, act,
+                                 msg="\n{}\n{}\n".format(str(want), str(act)))
+        for test in testsets[0].tests:
             self.assertIsNone(test.exception)
         self.assertTrue(result)
 
@@ -74,8 +76,8 @@ class TestSimpleExecution(unittest.TestCase):
     def test_for_allowed_failure(self):
         _prepare_environment("-c testdata/real_simple_config.yaml -vvvvv".split())
         config = _get_and_init_configuration()
-        tsgs = _get_test_set_groups(config)
-        tst = tsgs[0][0].tests[0]
+        testsets = _get_test_sets(config)
+        tst = testsets[0].tests[0]
         # we inject the allow_failure attribute here.
         tst.test_meta['allow_failure'] = True
         with patch("intmaniac.testrun.run_command") as mock:
@@ -92,4 +94,7 @@ class TestSimpleExecution(unittest.TestCase):
             result = tst.run()
         self.assertTrue(result)
         self.assertEqual(Testrun.CONTROLLED_FAILURE, tst.state)
-        self.assertEqual(expected_calls, mock.mock_calls)
+        for want, act in zip(expected_calls, mock.mock_calls):
+            self.assertEqual(want, act,
+                             msg="\nWANT: {}\nIS:   {}\n"
+                             .format(str(want), str(act)))

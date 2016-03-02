@@ -12,18 +12,17 @@ testsets:
   - basic:
 
       webpage_available:
+        test_commands:
+          # the service starts after 5 seconds, THIS WILL FAIL
+          - wget tested:8000 -O -
         meta:
           allow_failure: true
-          test_commands:
-            # the service starts after 5 seconds, THIS WILL FAIL
-            - wget tested:8000 -O -
 
 
   - extended_tests:
 
       webpage_available:
-        meta:
-          test_commands:
-            # WE NEED TO SLEEP, in the docker-compose there's a sleep too!!
-            - sleep 10
-            - wget tested:8000 -O -
+        test_commands:
+          # WE NEED TO SLEEP, in the docker-compose there's a sleep too!!
+          - sleep 10
+          - wget tested:8000 -O -

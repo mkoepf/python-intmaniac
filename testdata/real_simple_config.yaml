@@ -1,10 +1,9 @@
 ---
 global:
   meta:
-    docker_compose_template: ../testdata/real_simple_compose.yml
+    docker_compose_template: real_simple_compose.yml
 
 testsets:
   real:
     test1:
-      meta:
-        test_commands: echo hi
+      test_commands: echo hi

@@ -6,10 +6,10 @@ global:
 testsets:
   real:
     test1:
+      test_commands:
+        - echo hi
       meta:
         test_before:
           - sleep 1
-        test_commands:
-          - echo hi
         test_after:
           - sleep 2

@@ -4,6 +4,13 @@ output_format: teamcity
 # everything in the global key will be merged into every test, with the test data
 # getting preference.
 global:
+
+  # optional. array of test commands. each command can be a string or a list
+  #           the return value of the command determines whether the test
+  #           failed or succeeded.
+  #           if no commands are given the service is just "run"
+  test_commands: []
+
   meta:
     docker_compose_template: docker-compose.yml.tmpl
     docker_compose_params: # optional. a list of parameters to docker-compose
@@ -11,12 +18,6 @@ global:
     # optional. defaults to "test-service" if not there. the docker-compose
     #           service on which all the test commands are executed.
     test_service: ""
-
-    # optional. array of test commands. each command can be a string or a list
-    #           the return value of the command determines whether the test
-    #           failed or succeeded.
-    #           if no commands are given the service is just "run"
-    test_commands: []
 
     # optional - commands before and after the test run. intended for
     #            global settings
@@ -28,26 +29,36 @@ global:
 #           items are executed in parallel.
 testsets:
     # just names, no special meaning.
-  - default:
+  default:
 
-      # optional. a sub-set of global values, which overwrite the top-global
-      #           values if present, and are overwritten by test-specific
-      #           values.
-      _global: {}
+    # optional. a sub-set of global values, which overwrite the top-global
+    #           values if present, and are overwritten by test-specific
+    #           values.
+    _global: {}
 
-      # a test
-      latest:
+    # a test
+    latest:
 
-        # optional. test environment configuration.
-        environment:
-          companion0: my_container:latest
+      # optional. test environment configuration.
+      environment:
+        companion0: my_container:latest
 
-        # optional. test configuration
-        meta:
-          docker_compose_template: /some/other/template.yaml
-          allow_failure: true
+      # optional. test configuration
+      meta:
+        docker_compose_template: /some/other/template.yaml
 
-  - default:
-      demo:
-        environment:
-          companion0: my_container:demo
+  optional:
+
+    _global:
+      test_commands:
+        - run_tests.sh feature
+      meta:
+        allow_failure: true
+
+    demo0:
+      environment:
+        companion0: my_container:demo
+
+    demo1:
+      environment:
+        companion0: my_container:feature

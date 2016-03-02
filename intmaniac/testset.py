@@ -12,24 +12,24 @@ class Testset(object):
     def __repr__(self):
         return "<Testset '%s'>" % self.name
 
-    def __init__(self, global_config={}, *args, **kwargs):
-        super(Testset, self).__init__(*args, **kwargs)
+    def __init__(self, name, global_config={}):
+        self.name = name
         self.log = log.getLogger("ts-%s" % self.name)
         self.log.debug("Instantiated")
         self.tests = []
-        self.name = kwargs['name'] if kwargs.get('name') else "default"
-        self.global_config = global_config
+        self.global_config = global_config if global_config else {}
         self.failed_tests = []
         self.succeeded_tests = []
         self.success = True
 
-    def set_global_config(self, global_config):
-        self.global_config = global_config
+    def set_global_config(self, global_config=None):
+        if global_config:
+            self.global_config = global_config
 
-    def add_from_config(self, name, config, global_config=None):
-        global_config = global_config if global_config else self.global_config
-        self.tests.append(Testrun(deep_merge(global_config, config),
-                                  name="%s-%s" % (self.name, name)))
+    def add_from_config(self, name, config):
+        test_name = "%s-%s" % (self.name, name)
+        test_conf = deep_merge(self.global_config, config)
+        self.tests.append(Testrun(test_name, test_conf))
 
     def succeeded(self):
         return self.success

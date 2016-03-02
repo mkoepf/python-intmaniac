@@ -8,36 +8,28 @@ from os import getcwd
 
 
 configs = [
-    {
-        'args': (
-            {
-                'meta': {'docker_compose_template': '/tmpl.dat'},
-                'environment': {'wohoo': 'hoowoo'},
-            },
-        ),
-        'kwargs': {"name": "full-config"}
-    },
-    {
-        'args': (
-            {},
-        ),
-        'kwargs': {"name": "empty-config"}
-    },
-    {
-        'args': (
-            {'meta': {'docker_compose_template': '/tmpl.dat'}},
-        ),
-        'kwargs': {"name": "default-config"}
-    },
-    {
-        'args': (
-            {'meta': {
-                'test_basedir': '/mybasedir',
-                'docker_compose_template': '/tmpl.yml',
-            }},
-        ),
-        'kwargs': {"name": "basedir-set-config"}
-    },
+    [
+        "full-config",
+        {
+            'meta': {'docker_compose_template': '/tmpl.dat'},
+            'environment': {'wohoo': 'hoowoo'},
+        },
+    ],
+    [
+        "empty-config",
+        {},
+    ],
+    [
+        "default-config",
+        {'meta': {'docker_compose_template': '/tmpl.dat'}},
+    ],
+    [
+        "basedir-set-config",
+        {'meta': {
+            'test_basedir': '/mybasedir',
+            'docker_compose_template': '/tmpl.yml',
+        }},
+    ],
 ]
 
 
@@ -49,13 +41,13 @@ class TTestrun(unittest.TestCase):
     def test_object_creation_works(self):
         """Check if no errors appear on calling the constructor"""
         for config in configs:
-            t = Testrun(*config['args'], **config['kwargs'])
-            self.assertEqual(t.name, config['kwargs']['name'])
+            t = Testrun(*config)
+            self.assertEqual(t.name, config[0])
 
     def test_basedir_setting(self):
         """Check if the 'test_basedir' configuration is correctly evaluated"""
         config = configs[3]
-        t = Testrun(*config['args'], **config['kwargs'])
+        t = Testrun(*config)
         self.assertEqual(1, len(t.test_env))
         self.assertEqual('/mybasedir/basedir-set-config', t.test_env['test_dir'])
 
@@ -63,7 +55,7 @@ class TTestrun(unittest.TestCase):
         """Check if all paths are calculated correctly"""
         # nothing specified
         args = {'meta': {'_configfile': '/test/booyah'}}
-        t = Testrun(args, name="testname")
+        t = Testrun("testname", args)
         self.assertEqual('/test/docker-compose.yml.tmpl', t.template)
         self.assertEqual('docker-compose.yml.tmpl', t.template_name)
         self.assertEqual('/test', t.base_dir)
@@ -72,7 +64,7 @@ class TTestrun(unittest.TestCase):
         args = {'meta': {'_configfile': '/t0/conf',
                          'test_basedir': './td',
                          'docker_compose_template': '/tmpl'}}
-        t = Testrun(args, name="testname")
+        t = Testrun("testname", args)
         self.assertEqual('/tmpl', t.template)
         self.assertEqual('tmpl', t.template_name)
         self.assertEqual('/t0/td', t.base_dir)
@@ -81,7 +73,7 @@ class TTestrun(unittest.TestCase):
         args = {'meta': {'_configfile': '/t0/conf',
                          'test_basedir': '/td',
                          'docker_compose_template': 'tmpl'}}
-        t = Testrun(args, name="testname")
+        t = Testrun("testname", args)
         self.assertEqual('/t0/tmpl', t.template)
         self.assertEqual('tmpl', t.template_name)
         self.assertEqual('/td', t.base_dir)
@@ -90,7 +82,7 @@ class TTestrun(unittest.TestCase):
         args = {'meta': {'_configfile': '/t0/conf',
                          'test_basedir': '/td',
                          'docker_compose_template': '/tmpl'}}
-        t = Testrun(args, name="testname")
+        t = Testrun("testname", args)
         self.assertEqual('/tmpl', t.template)
         self.assertEqual('tmpl', t.template_name)
         self.assertEqual('/td', t.base_dir)
@@ -101,7 +93,7 @@ class TTestrun(unittest.TestCase):
         cdir = getcwd()
         # nothing specified
         args = {'meta': {}}
-        t = Testrun(args, name="testname")
+        t = Testrun("testname", args)
         self.assertEqual('%s/docker-compose.yml.tmpl' % cdir, t.template)
         self.assertEqual('docker-compose.yml.tmpl', t.template_name)
         self.assertEqual('%s' % cdir, t.base_dir)
@@ -109,7 +101,7 @@ class TTestrun(unittest.TestCase):
         # relative basedir, absolute template dir
         args = {'meta': {'test_basedir': './td',
                          'docker_compose_template': '/tmpl'}}
-        t = Testrun(args, name="testname")
+        t = Testrun("testname", args)
         self.assertEqual('/tmpl', t.template)
         self.assertEqual('tmpl', t.template_name)
         self.assertEqual('%s/td' % cdir, t.base_dir)
@@ -117,7 +109,7 @@ class TTestrun(unittest.TestCase):
         # absolute basedir, relative template dir
         args = {'meta': {'test_basedir': '/td',
                          'docker_compose_template': 'tmpl'}}
-        t = Testrun(args, name="testname")
+        t = Testrun("testname", args)
         self.assertEqual('%s/tmpl' % cdir, t.template)
         self.assertEqual('tmpl', t.template_name)
         self.assertEqual('/td', t.base_dir)
@@ -125,7 +117,7 @@ class TTestrun(unittest.TestCase):
         # absolute basedir, absolute template dir
         args = {'meta': {'test_basedir': '/td',
                          'docker_compose_template': '/tmpl'}}
-        t = Testrun(args, name="testname")
+        t = Testrun("testname", args)
         self.assertEqual('/tmpl', t.template)
         self.assertEqual('tmpl', t.template_name)
         self.assertEqual('/td', t.base_dir)

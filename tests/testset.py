@@ -12,7 +12,7 @@ class TTestset(unittest.TestCase):
         enable_debug()
 
     def test_global_environment_propagation(self):
-        t = Testset()
+        t = Testset('default')
         t.set_global_config({'environment': {"ho": "wo"}})
         t.add_from_config("added", {})
         self.assertEqual(1, len(t.tests))

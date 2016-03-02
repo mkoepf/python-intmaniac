@@ -27,9 +27,9 @@ default_config = {
         'test_service': 'test-service',
         # optional values
         'docker_compose_params': [],
-        'test_commands': None,
         'test_report_files': None,
     },
+    'test_commands': None,
 }
 
 
@@ -43,12 +43,15 @@ class Testrun(object):
     CONTROLLED_FAILURE = "ALLOWED_FAILURE"
     FAILURE = "FAILED"
 
-    def __init__(self, test_definition, *args, **kwargs):
-        super(Testrun, self).__init__(*args, **kwargs)
+    def __init__(self, name, test_definition):
+        self.name = name
         test_definition = deep_merge(default_config, test_definition)
         # quick shortcuts
         self.test_env = test_definition['environment']
         self.test_meta = test_definition['meta']
+        self.test_commands = test_definition.get('test_commands', [])
+        if isinstance(self.test_commands, str):
+            self.test_commands = [self.test_commands]
         # okay.
         # let's keep all file references relative to the configuration
         # file. easy to remember.
@@ -80,9 +83,6 @@ class Testrun(object):
         self.commandline.append("--rm")
         self.commandline.extend(copy.copy(default_commandline_end))
         self.commandline.append(self.test_meta['test_service'])
-        # sanitize SELF.TEST_META['test_commands']
-        if type(self.test_meta['test_commands']) == str:
-            self.test_meta['test_commands'] = [self.test_meta['test_commands']]
         # create .STATE, .RESULT, .EXCEPTION, .REASON
         self.state = self.NOTRUN
         self.results = []
@@ -155,7 +155,7 @@ class Testrun(object):
             self.init_environment()
             commands = []
             commands.extend(self.test_meta.get('test_before', []))
-            commands.extend(self.test_meta.get('test_commands', [None]))
+            commands.extend(self.test_commands)
             commands.extend(self.test_meta.get('test_after', []))
             for cmd in commands:
                 cmd = cmd.split(" ") if type(cmd) == str else cmd
