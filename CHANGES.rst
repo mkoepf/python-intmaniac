@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+0.9.0
+-----
+
+- Removed multi-threaded execution of tests / test sets
+- Changed file format (moved ``test_commands`` out of ``meta`` subdict)
+- Changed file format (no more "arrays of test sets")
+- Changed execution order of tests (in alphabetical order by test set key), same for tests
+- Added explicit test for ``test_commands``, ``meta.test_before``, ``meta.test_after`` command construction
+
+
 0.8.0
 -----
 
