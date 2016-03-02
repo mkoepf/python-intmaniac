@@ -45,7 +45,7 @@ def _get_test_sets(setupdata):
         # remove global settings from test set
         ts.set_global_config(tools.deep_merge(global_config,
                                               tests.pop("_global", {})))
-        for test_name, test_config in tests.items():
+        for test_name, test_config in sorted(tests.items()):
             # the overrides have precedence above everything
             use_test_config = tools.deep_merge(test_config, global_overrides)
             ts.add_from_config(test_name, use_test_config)
