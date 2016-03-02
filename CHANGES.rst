@@ -1,15 +1,12 @@
 CHANGELOG
 =========
 
-0.9.2
------
+0.9.1 - 0.9.3
+-------------
 
-- Fixed bug which made invoking intmaniac impossible
+Date: 2016-03-02
 
-
-0.9.1
------
-
+- Fixed console invocation bug in three attempts
 - Fixed bug in main execution loop
 - Added test for main execution loop
 
